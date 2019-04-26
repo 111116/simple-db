@@ -40,7 +40,7 @@ int Table::remove(cond_t cond)
 /**
  * Updates entries which satisfy condition ${cond} with data ${set}.
  * 
- * @param Update data
+ * @param Update method (as a function)
  * @param Update condition
  * @return Number of entries updated
 */
@@ -48,7 +48,7 @@ int Table::update(set_t set, cond_t cond)
 {
 	int entriesAffected = 0;
 	for (Entry& e: data)
-		if (cond(e)) e.set(set), ++entriesAffected;
+		if (cond(e)) set(e), ++entriesAffected;
 	return entriesAffected;
 }
 
