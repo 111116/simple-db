@@ -1,9 +1,13 @@
 #pragma once
 
-#include "entry.h"
-#include "cond.h"
-#include "set.h"
+#include <string>
+#include <vector>
+#include <functional>
 
+#include "entry.h"
+#include "data_t.h"
+#include "cond_t.h"
+#include "set_t.h"
 
 class Table
 {

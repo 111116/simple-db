@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "entry.h"
 
 typedef std::function<bool(Entry)> cond_t;
