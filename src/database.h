@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include "table.h"
+
 class Database
 {
 private:

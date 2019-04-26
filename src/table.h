@@ -4,6 +4,8 @@
 #include <vector>
 #include <functional>
 
+#include <iostream>
+
 #include "entry.h"
 #include "data_t.h"
 #include "cond_t.h"
@@ -18,9 +20,11 @@ private:
 		{
 			INTEGER, DOUBLE, STRING
 		};
+		int length;
 		type_t type;
 		std::string name;
 		bool nonNull = false;
+		std::string typeName();
 	};
 	std::vector<attr_t> attr;
 	std::vector<Entry> data;
@@ -29,10 +33,11 @@ private:
 	cond_t atomCond(std::string);
 
 public:
+	Table(std::string);
 	cond_t buildCond(std::string);
-	void insert(Entry);
-	void remove(cond_t);
-	void update(set_t, cond_t);
-	void select(cond_t);
-	void show();
+	int insert(const Entry&);
+	int remove(cond_t);
+	int update(set_t, cond_t);
+	int select(cond_t, Table&);
+	void show(std::ostream& = std::cout);
 };
