@@ -31,10 +31,15 @@ private:
 	int primaryAttr = -1;
 	std::function<data_t*(const Entry&)> getDatabyAttr(std::string);
 	cond_t atomCond(std::string);
+	cond_t atomSet(std::string);
 
 public:
 	Table(std::string);
+
 	cond_t buildCond(std::string);
+	set_t buildSet(std::string);
+	Entry buildEntry(std::string attrlist, std::string datalist);
+	
 	int insert(const Entry&);
 	int remove(cond_t);
 	int update(set_t, cond_t);

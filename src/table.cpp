@@ -1,6 +1,18 @@
 #include "table.h"
 
 /**
+ * Table constructor
+ * attrlist format: (attrName1 Type1, ..., attrNameN TypeN NOT NULL, PRIMARY KEY(attrName1))
+ * 
+ * @param attrlist
+*/
+Table::Table(std::string)
+{
+
+}
+
+
+/**
  * Makes a boolean entry filter function with the string specified.
  * 
  * @param Condition
@@ -10,6 +22,32 @@ cond_t Table::buildCond(std::string)
 {
 
 }
+
+
+/**
+ * Makes a entry modifier function with the string specified.
+ * 
+ * @param Operation
+ * @return modifier function based on this operation string.
+*/
+cond_t Table::buildSet(std::string)
+{
+
+}
+
+
+/**
+ * Makes an entry with the string specified.
+ * 
+ * @param attribute list (unparsed)
+ * @param data list (unparsed)
+ * @return entry constructed.
+*/
+Entry Table::buildEntry(std::string attrlist, std::string datalist)
+{
+
+}
+
 
 /**
  * Inserts an entry to this table.
@@ -22,6 +60,7 @@ int Table::insert(const Entry& entry)
 	data.push_back(entry);
 	return 1;
 }
+
 
 /**
  * Deletes entries which satisfy condition ${cond} from this table.
@@ -37,6 +76,7 @@ int Table::remove(cond_t cond)
 	return entriesRemoved;
 }
 
+
 /**
  * Updates entries which satisfy condition ${cond} with data ${set}.
  * 
@@ -51,6 +91,7 @@ int Table::update(set_t set, cond_t cond)
 		if (cond(e)) set(e), ++entriesAffected;
 	return entriesAffected;
 }
+
 
 /**
  * Selects entries which satisfy condition ${cond}, and puts the result into ${result} as a new table.
@@ -69,6 +110,7 @@ int Table::select(cond_t cond, Table& result)
 		if (cond(e)) result.insert(e);
 	return result.data.size();
 }
+
 
 /**
  * Lists columns of this table.
