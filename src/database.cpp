@@ -42,7 +42,7 @@ void Database::show(std::string tableName)
 
 
 /**
- * Find a table in this database
+ * Finds a table in this database
  * 
  * @param Name of the table
  * @return Pointer to specified table (NULL if not found)
@@ -51,5 +51,5 @@ Table* Database::operator[](std::string tableName)
 {
 	if (table.count(tableName))
 		return table[tableName];
-	return NULL;
+	return nullptr;
 }

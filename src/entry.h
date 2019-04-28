@@ -4,8 +4,4 @@
 
 #include "data_t.h"
 
-class Entry
-{
-private:
-	std::vector<data_t&> data;
-};
+typedef std::vector<data_t*> Entry;

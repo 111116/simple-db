@@ -15,9 +15,11 @@ class dataInt : public data_t
 private:
 	int value;
 public:
-	virtual bool operator < (const dataInt&);
-	virtual bool operator > (const dataInt&);
-	virtual bool operator == (const dataInt&);
+	dataInt(int);
+	dataInt(std::string);
+	virtual bool operator < (const dataInt&) const;
+	virtual bool operator > (const dataInt&) const;
+	virtual bool operator == (const dataInt&) const;
 };
 
 class dataDouble : public data_t
@@ -25,9 +27,11 @@ class dataDouble : public data_t
 private:
 	double value;
 public:
-	virtual bool operator < (const dataDouble&);
-	virtual bool operator > (const dataDouble&);
-	virtual bool operator == (const dataDouble&);
+	dataDouble(double);
+	dataDouble(std::string);
+	virtual bool operator < (const dataDouble&) const;
+	virtual bool operator > (const dataDouble&) const;
+	virtual bool operator == (const dataDouble&) const;
 };
 
 class dataString : public data_t
@@ -35,7 +39,8 @@ class dataString : public data_t
 private:
 	std::string value;
 public:
-	virtual bool operator < (const dataString&);
-	virtual bool operator > (const dataString&);
-	virtual bool operator == (const dataString&);
+	dataString(std::string);
+	virtual bool operator < (const dataString&) const;
+	virtual bool operator > (const dataString&) const;
+	virtual bool operator == (const dataString&) const;
 };
