@@ -14,4 +14,4 @@ public:
 	void create(std::string tableName, std::string traits);
 	void show(std::string tableName);
 	Table* operator[] (std::string tableName);
-}
+};
