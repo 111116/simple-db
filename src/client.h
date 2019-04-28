@@ -1,10 +1,16 @@
+#pragma once
 
-std::map<std::string, Database> dblist;
+#include <map>
+#include <string>
+
+#include "database.h"
+
+std::map<std::string, Database> dbList;
 
 void drop(std::string dbName);
 void create(std::string dbName);
 void show(std::string dbName);
 
-static Database* selected = NULL;
+static Database* selected = nullptr;
 
 static void interact();

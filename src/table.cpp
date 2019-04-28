@@ -1,6 +1,29 @@
 #include "table.h"
 
 /**
+ * Returns attributes (data type, width, etc.) of this column in a string.
+*/
+std::string Table::attr_t::typeName()
+{
+	switch (type)
+	{
+		case type_t::INTEGER:
+		{
+			return "int(" + std::to_string(width) + ")";
+		}
+		case type_t::DOUBLE:
+		{
+			return "double(" + std::to_string(width) + ")";
+		}
+		case type_t::STRING:
+		{
+			return "char(" + std::to_string(width) + ")";
+		}
+	}
+}
+
+
+/**
  * Table constructor
  * attrlist format: (attrName1 Type1, ..., attrNameN TypeN NOT NULL, PRIMARY KEY(attrName1))
  * 
@@ -30,7 +53,7 @@ cond_t Table::buildCond(std::string)
  * @param Operation
  * @return modifier function based on this operation string.
 */
-cond_t Table::buildSet(std::string)
+set_t Table::buildSet(std::string)
 {
 
 }

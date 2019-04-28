@@ -20,7 +20,7 @@ private:
 		{
 			INTEGER, DOUBLE, STRING
 		};
-		int length;
+		int width;
 		type_t type;
 		std::string name;
 		bool nonNull = false;
