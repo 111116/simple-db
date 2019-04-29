@@ -2,10 +2,11 @@
 
 #include <map>
 #include <string>
+#include <iostream>
 
 #include "database.h"
 
-std::map<std::string, Database> dbList;
+std::map<std::string, Database*> dbList;
 
 void drop(std::string dbName);
 void create(std::string dbName);

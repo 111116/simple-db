@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <algorithm>
 
 class data_t
 {
@@ -44,3 +45,5 @@ public:
 	virtual bool operator > (const dataString&) const;
 	virtual bool operator == (const dataString&) const;
 };
+
+std::string stringToLower(std::string);

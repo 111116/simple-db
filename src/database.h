@@ -7,8 +7,8 @@
 class Database
 {
 private:
-	std::map<std::string, Table*> table;
 public:
+	std::map<std::string, Table*> table;
 	~Database();
 	void drop(std::string tableName);
 	void create(std::string tableName, std::string traits);

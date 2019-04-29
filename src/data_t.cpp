@@ -35,13 +35,19 @@ bool dataDouble::operator == (const dataDouble &b) const {
 dataString::dataString(std::string value) : value(value) {}
 
 bool dataString::operator < (const dataString& b) const {
-	return value < b.value;
+	return stringToLower(value) < stringToLower(b.value);
 }
 
 bool dataString::operator > (const dataString& b) const {
-	return value > b.value;
+	return stringToLower(value) > stringToLower(b.value);
 }
 
 bool dataString::operator == (const dataString &b) const {
-	return value == b.value;
+	return stringToLower(value) == stringToLower(b.value);
+}
+
+std::string stringToLower(std::string str)
+{
+	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+	return str;
 }

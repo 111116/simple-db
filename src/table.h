@@ -24,7 +24,7 @@ private:
 		type_t type;
 		std::string name;
 		bool nonNull = false;
-		std::string typeName();
+		std::string typeName() const;
 	};
 	std::vector<attr_t> attr;
 	std::vector<Entry> data;

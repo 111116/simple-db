@@ -3,7 +3,7 @@
 /**
  * Returns attributes (data type, width, etc.) of this column in a string.
 */
-std::string Table::attr_t::typeName()
+std::string Table::attr_t::typeName() const
 {
 	switch (type)
 	{
@@ -144,7 +144,7 @@ void Table::show(std::ostream& o)
 {
 	o << "Field\tType\tNull\tKey\tDefault\tExtra\n";
 	for (unsigned i = 0; i < attr.size(); ++i) {
-		Table::attr_t& a = attr[i];
+		const Table::attr_t& a = attr[i];
 		o << a.name << '\t' << a.typeName() << '\t' << (a.nonNull ? "YES" : "NO") << '\t' << (i == primaryAttr ? "PRI" : "") << "\tNULL" << "\t\n";
 	}
 }
