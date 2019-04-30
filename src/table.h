@@ -27,22 +27,26 @@ private:
 		std::string typeName() const;
 	};
 	std::vector<attr_t> attr;
+	std::unordered_map<std::string, unsigned> attrindex;
 	std::vector<Entry> data;
 	int primaryAttr = -1;
-	std::function<data_t*(const Entry&)> getDatabyAttr(std::string);
+
 	cond_t atomCond(std::string);
 	cond_t atomSet(std::string);
+	cond_t buildCond(std::string);
+	set_t buildSet(std::string);
+	Entry buildEntry(std::string attrlist, std::string datalist);
 
 public:
 	Table(std::string);
 
-	cond_t buildCond(std::string);
-	set_t buildSet(std::string);
-	Entry buildEntry(std::string attrlist, std::string datalist);
-	
-	int insert(const Entry&);
-	int remove(cond_t);
-	int update(set_t, cond_t);
-	int select(cond_t, Table&);
+	int insert(std::string attrName, std::string attrValue);
+	int remove();
+	int remove(std::string whereClause);
+	int update(std::string setClause);
+	int update(std::string setClause, std::string whereClause);
+	int select(std::string attrName);
+	int select(std::string attrName, std::string whereClause);
+
 	void show(std::ostream& = std::cout);
 };
