@@ -10,7 +10,7 @@ void create(std::string dbName)
 
 void drop(std::string dbName)
 {
-	//delete t.second;
+	delete dbList[dbName].second;
 	dbList.erase(dbName);
 }
 
@@ -22,15 +22,24 @@ void use(std::string dbName)
 void show()
 {
 	std::cout << "Database\n";
-	for (auto t : dbList)
+	for (auto t: dbList)
 		std::cout << t.first << std::endl;
 }
 
 std::string read()
 {
 	std::string str;
+	std::cin >> str;
 	if (str.back() == ';')
 		str.pop_back();
+	return str;
+}
+
+std::string trans(std::string str)
+{
+	for (int i = 0; i < str.size(); i++)
+		if (str[i] >= 'A' && str[i] <= 'Z')
+			str[i] += 'a' - 'A';
 	return str;
 }
 
@@ -39,16 +48,18 @@ int main()
 	while (true)
 	{
 		auto str1 = read(), str2 = read();
-		if (str1 == "CREATE" && str2 == "DATABASE")
+		auto st1 = trans(str1), st2 = trans(str2);
+		
+		if (st1 == "create" && st2 == "database")
 			create(read());
-		if (str1 == "DROP" && str2 == "DATABASE")
+		if (st1 == "drop" && st2 == "database")
 			drop(read());
-		if (str1 == "USE" && str2 == "DATABASE")
-			use(read());
-		if (str1 == "SHOW" && str2 == "DATABASE")
+		if (st1 == "use" && str2 != "table")
+			use(str2);
+		if (st1 == "show" && st2 == "databases")
 			show();
 
-		if (str1 == "CREATE" && str2 == "TABLE")
+		if (st1 == "create" && st2 == "table")
 		{
 			auto str = read();
 			auto t = str.find('(');
@@ -56,37 +67,69 @@ int main()
 			auto traits = str.substr(t + 1, str.size() - t - 2);
 			selected->create(tableName, traits);
 		}
-		if (str1 == "DROP" && str2 == "TABLE")
+		if (st1 == "drop" && st2 == "table")
 			selected->drop(read());
-		if (str1 == "SHOW" && str2 == "columns")
+		if (st1 == "show" && st2 == "tables")
+			selected->show();
+		if (st1 == "show" && st2 == "columns")
+		{
+			read();
 			selected->show(read());
+		}
 
-		if (str1 == "INSERT" && str2 == "INTO")
+		if (st1 == "insert" && st2 == "into")
 		{
 			auto str = read();
 			auto t = str.find('(');
 			auto tableName = str.substr(0, t);
-			auto attrlist = str.substr(t + 1, str.size() - t + 1);
-			str = read();
+			auto attrlist = str.substr(t + 1, (str.size() - 2) - (t + 1) + 1);
+			read();
 			auto datalist = str.substr(1, str.size() - 2);
-			auto tmp = selected->table[tableName]->buildEntry(attrlist, datalist);
-			selected->table[tableName]->insert(tmp);
+			selected->table[tableName]->insert(attrlist, datalist);
 		}
-		if (str1 == "DELETE" && str2 == "FROM")
+		if (st1 == "delete" && st2 == "from")
 		{
 			auto tableName = read();
+			std::string whereClause;
+			std::getline(std::cin, whereClause);
+			auto t = trans(whereClause).find("where");
+			if (t == whereClause.npos)
+				selected->table[tableName]->remove();
+			else {
+				whereClause = whereClause.substr(t + 6, (whereClause.size() - 1) - (t + 6) + 1);
+				selected->table[tableName]->remove(whereClause);
+			}
+		}
+		if (st1 == "update")
+		{
+			auto& tableName = str2;
+			read(); getchar();
+			std::string setClause;
+			std::getline(std:cin, setClause);
+			auto t = trans(setClause).find("where");
+			if (t == setClause.npos)
+				selected->table[tableName]->update(setClause);
+			else {
+				auto whereClause = setClause.substr(t + 6, (setClause.size() - 1) - (t + 6) + 1);
+				setClause = setClause.substr(0, t - 1);
+				selected->table[tableName]->update(setClause, WhereClause);
+			}
+			
+		}
+		if (st1 == "select")
+		{
+			auto& attrName = str2;
 			read();
-			std::string str;
-			std::getline(std::cin, str);
-			str.pop_back();
-			auto tmp = selected->table[tableName]->buildCond(str);
-			selected->table[tableName]->remove(tmp);
-		}
-		if (str1 == "UPDATE")
-		{
-		}
-		if (str1 == "SELECT")
-		{
+			auto tableName = read();
+			std::string whereClause;
+			std::getline(std::cin, whereClause);
+			auto t = trans(whereClause).find("where");
+			if (t == whereClause.npos)
+				selected->table[tableName]->select(attrName);
+			else {
+				whereClause = whereClause.substr(t + 6, (whereClause.size() - 1) - (t + 6) + 1);
+				selected->table[tableName]->select(whereClause);
+			}
 		}
 	}
 }

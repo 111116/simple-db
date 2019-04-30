@@ -10,16 +10,6 @@ Database::~Database()
 }
 
 /**
- * Drops a table named ${tableName} from this database.
- * 
- * @param Name of the table to be dropped
-*/
-void Database::drop(std::string tableName)
-{
-	table.erase(tableName);
-}
-
-/**
  * Creates a table in this database.
  * 
  * @param Name of the table to be created
@@ -31,6 +21,23 @@ void Database::create(std::string tableName, std::string traits)
 }
 
 /**
+ * Drops a table named ${tableName} from this database.
+ * 
+ * @param Name of the table to be dropped
+*/
+void Database::drop(std::string tableName)
+{
+	table.erase(tableName);
+}
+
+void Database::show()
+{
+	std::cout << "Table" << std::endl;
+	for (auto p: table)
+		std::cout << p.first << std::endl;
+}
+
+/**
  * Lists columns of a table specified in this database.
  * 
  * @param Name of the table
@@ -39,7 +46,6 @@ void Database::show(std::string tableName)
 {
 	table[tableName]->show();
 }
-
 
 /**
  * Finds a table in this database
