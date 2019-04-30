@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <functional>
 
 #include <iostream>
@@ -47,6 +48,7 @@ public:
 	int update(std::string setClause, std::string whereClause);
 	int select(std::string attrName);
 	int select(std::string attrName, std::string whereClause);
+	int filter(std::string whereClause, Table& result)
 
 	void show(std::ostream& = std::cout);
 };

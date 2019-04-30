@@ -38,6 +38,29 @@ Table::Table(std::string)
 /**
  * Makes a boolean entry filter function with the string specified.
  * 
+ * @param Condition (single operation)
+ * @return Boolean filter function based on this condition string.
+*/
+cond_t Table::atomCond(std::string)
+{
+	std::string operand1;
+	std::string operation;
+	std::string operand2;
+	// TODO parse
+	int index1 = attrindex.count(operand1)? attrindex[operand1]: -1;
+	int index2 = attrindex.count(operand2)? attrindex[operand2]: -1;
+	
+	return [=](Entry& entry)
+	{
+		(index1==-1? )
+	}
+}
+
+
+
+/**
+ * Makes a boolean entry filter function with the string specified.
+ * 
  * @param Condition
  * @return Boolean filter function based on this condition string.
 */
@@ -75,12 +98,13 @@ Entry Table::buildEntry(std::string attrlist, std::string datalist)
 /**
  * Inserts an entry to this table.
  * 
- * @param Entry to insert
+ * @param list of attribute names
+ * @param list of attribute values
  * @return Number of entries inserted
 */
-int Table::insert(const Entry& entry)
+int Table::insert(std::string attrName, std::string attrValue)
 {
-	data.push_back(entry);
+	data.push_back(buildEntry(attrName, attrValue));
 	return 1;
 }
 
@@ -91,12 +115,30 @@ int Table::insert(const Entry& entry)
  * @param Delete condition
  * @return Number of entries deleted
 */
-int Table::remove(cond_t cond)
+int Table::remove(std::string whereClause);
 {
+	cond_t cond = buildCond(whereClause);
 	auto iter = std::remove_if(data.begin(), data.end(), cond);
 	int entriesRemoved = std::distance(iter, data.end());
 	data.erase(iter, data.end());
 	return entriesRemoved;
+}
+
+
+
+
+/**
+ * Updates all entries with ${setClause}.
+ * 
+ * @param Update method (as a function)
+ * @return Number of entries updated
+*/
+int Table::update(std::string setClause)
+{
+	set_t set = buildSet(setClause);
+	for (Entry& e: data)
+		set(e);
+	return data.size();
 }
 
 
@@ -107,11 +149,42 @@ int Table::remove(cond_t cond)
  * @param Update condition
  * @return Number of entries updated
 */
-int Table::update(set_t set, cond_t cond)
+int Table::update(std::string setClause, std::string whereClause)
 {
+	set_t set = buildSet(setClause);
+	cond_t cond = buildCond(whereClause);
 	int entriesAffected = 0;
 	for (Entry& e: data)
 		if (cond(e)) set(e), ++entriesAffected;
+	return entriesAffected;
+}
+
+
+
+int Table::select(std::string attrName)
+{
+	if (!attrindex.count(attrName))
+		throw "no such attr";
+	int index = attrindex[attrName];
+	for (Entry& e: data)
+		e[index].print();
+	return data.size();
+}
+
+
+int Table::select(std::string attrName, std::string whereClause)
+{
+	if (!attrindex.count(attrName))
+		throw "no such attr";
+	int index = attrindex[attrName];
+	cond_t cond = buildCond(whereClause);
+	int entriesAffected = 0;
+	for (Entry& e: data)
+		if (cond(e))
+		{
+			e[index].print();
+			++entriesAffected;
+		}
 	return entriesAffected;
 }
 
@@ -123,12 +196,13 @@ int Table::update(set_t set, cond_t cond)
  * @param Table for select result
  * @return Number of entries selected
 */
-int Table::select(cond_t cond, Table& result)
+int Table::filter(std::string whereClause, Table& result)
 {
 	result.attr = this->attr;
-	result.data.clear();
+	result.attrindex = this->attrindex;
 	result.primaryAttr = this->primaryAttr;
-
+	result.data.clear();
+	cond_t cond = buildCond(whereClause);
 	for (Entry& e: data)
 		if (cond(e)) result.insert(e);
 	return result.data.size();
