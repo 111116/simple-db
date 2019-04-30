@@ -4,4 +4,15 @@
 
 #include "data_t.h"
 
-typedef std::vector<data_t*> Entry;
+class Entry: public std::vector<data_t*>
+{
+public:
+	using std::vector<data_t*>::vector;
+	Entry(const Entry&) = delete;
+	~Entry()
+	{
+		for (auto p: *this)
+			if (p != nullptr)
+				delete p;
+	}
+};
