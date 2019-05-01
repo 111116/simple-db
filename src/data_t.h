@@ -5,7 +5,10 @@
 
 class data_t
 {
+private:
+	std::string value;
 public:
+	data_t(std::string value);
 	virtual bool operator < (const data_t&) = 0;
 	virtual bool operator > (const data_t&) = 0;
 	virtual bool operator == (const data_t&) = 0;
@@ -13,37 +16,29 @@ public:
 
 class dataInt : public data_t
 {
-private:
-	int value;
 public:
-	dataInt(int);
-	dataInt(std::string);
-	virtual bool operator < (const dataInt&) const;
-	virtual bool operator > (const dataInt&) const;
-	virtual bool operator == (const dataInt&) const;
+	using data_t::data_t;
+	bool operator < (const dataInt&) const override;
+	bool operator > (const dataInt&) const override;
+	bool operator == (const dataInt&) const override;
 };
 
 class dataDouble : public data_t
 {
-private:
-	double value;
 public:
-	dataDouble(double);
-	dataDouble(std::string);
-	virtual bool operator < (const dataDouble&) const;
-	virtual bool operator > (const dataDouble&) const;
-	virtual bool operator == (const dataDouble&) const;
+	using data_t::data_t;
+	bool operator < (const dataDouble&) const override;
+	bool operator > (const dataDouble&) const override;
+	bool operator == (const dataDouble&) const override;
 };
 
 class dataString : public data_t
 {
-private:
-	std::string value;
 public:
-	dataString(std::string);
-	virtual bool operator < (const dataString&) const;
-	virtual bool operator > (const dataString&) const;
-	virtual bool operator == (const dataString&) const;
+	using data_t::data_t;
+	bool operator < (const dataString&) const override;
+	bool operator > (const dataString&) const override;
+	bool operator == (const dataString&) const override;
 };
 
 std::string stringToLower(std::string);

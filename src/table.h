@@ -21,7 +21,7 @@ private:
 		{
 			INTEGER, DOUBLE, STRING
 		};
-		int width;
+		//int width;
 		type_t type;
 		std::string name;
 		bool nonNull = false;

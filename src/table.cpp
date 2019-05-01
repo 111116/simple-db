@@ -9,15 +9,18 @@ std::string Table::attr_t::typeName() const
 	{
 		case type_t::INTEGER:
 		{
-			return "int(" + std::to_string(width) + ")";
+			//return "int(" + std::to_string(width) + ")";
+			return "int(11)";
 		}
 		case type_t::DOUBLE:
 		{
-			return "double(" + std::to_string(width) + ")";
+			//return "double(" + std::to_string(width) + ")";
+			return "double";
 		}
 		case type_t::STRING:
 		{
-			return "char(" + std::to_string(width) + ")";
+			//return "char(" + std::to_string(width) + ")";
+			return "char(1)";
 		}
 	}
 }
