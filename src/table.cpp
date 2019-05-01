@@ -32,9 +32,41 @@ std::string Table::attr_t::typeName() const
  * 
  * @param attrlist
 */
-Table::Table(std::string)
+Table::Table(std::string attrClause)
 {
-
+	attrClause += ',';
+	std::vector<std::string> str;
+	str.push_back("");
+	std::string primaryKey; 
+	for (auto c: attrClause){
+		if (c == ' ' || c == '(' || c == ')')
+		{
+			if (!str.back().empty())
+				str.push_back("");
+		}
+		else if (c == ',')
+			{
+				if (!str.back().empty())
+					str.push_back("");
+				if (str.size() == 4)
+					primaryKey = str[2];
+				else
+				{
+					str[1] = stringToLower(str[1]);
+					type tmp;
+					if (str[1] == "integer") tmp = type_t::INTEGER;
+					if (str[1] == "double") tmp = type_t::DOUBLE;
+					if (str[1] == "string") tmp = type_t::STRING;
+					attr.push_back((attr_t){tmp, str[0], str.size() == 5});
+					attrIndex[str[0]] = attr.size();
+				}
+				str.clear();
+				str.push_back("");
+			}
+		else str.back() += c;
+	}
+	if (!PrimaryKey.empty())
+		primaryAttr = attrIndex[primaryKey];
 }
 
 
@@ -50,8 +82,8 @@ cond_t Table::atomCond(std::string)
 	std::string operation;
 	std::string operand2;
 	// TODO parse
-	int index1 = attrindex.count(operand1)? attrindex[operand1]: -1;
-	int index2 = attrindex.count(operand2)? attrindex[operand2]: -1;
+	int index1 = attrIndex.count(operand1)? attrIndex[operand1]: -1;
+	int index2 = attrIndex.count(operand2)? attrIndex[operand2]: -1;
 	
 	return [=](Entry& entry)
 	{
@@ -166,9 +198,9 @@ int Table::update(std::string setClause, std::string whereClause)
 
 int Table::select(std::string attrName)
 {
-	if (!attrindex.count(attrName))
+	if (!attrIndex.count(attrName))
 		throw "no such attr";
-	int index = attrindex[attrName];
+	int index = attrIndex[attrName];
 	for (Entry& e: data)
 		e[index].print();
 	return data.size();
@@ -177,9 +209,9 @@ int Table::select(std::string attrName)
 
 int Table::select(std::string attrName, std::string whereClause)
 {
-	if (!attrindex.count(attrName))
+	if (!attrIndex.count(attrName))
 		throw "no such attr";
-	int index = attrindex[attrName];
+	int index = attrIndex[attrName];
 	cond_t cond = buildCond(whereClause);
 	int entriesAffected = 0;
 	for (Entry& e: data)
@@ -202,7 +234,7 @@ int Table::select(std::string attrName, std::string whereClause)
 int Table::filter(std::string whereClause, Table& result)
 {
 	result.attr = this->attr;
-	result.attrindex = this->attrindex;
+	result.attrIndex = this->attrIndex;
 	result.primaryAttr = this->primaryAttr;
 	result.data.clear();
 	cond_t cond = buildCond(whereClause);

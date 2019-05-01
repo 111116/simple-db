@@ -2,39 +2,39 @@
 
 data_t::data_t(int value) : value(value) {}
 
-bool dataInt::operator < (const dataInt& b) const override {
+bool dataInt::operator < (const dataInt& b) const {
 	return std::stoi(value) < std::stoi(b.value);
 }
 
-bool dataInt::operator > (const dataInt& b) const override {
+bool dataInt::operator > (const dataInt& b) const {
 	return std::stoi(value) > std::stoi(b.value);
 }
 
-bool dataInt::operator == (const dataInt& b) const override {
+bool dataInt::operator == (const dataInt& b) const {
 	return std::stoi(value) == std::stoi(b.value);
 }
 
-bool dataDouble::operator < (const dataDouble& b) const override {
+bool dataDouble::operator < (const dataDouble& b) const {
 	return std::stod(value) < std::stod(b.value);
 }
 
-bool dataDouble::operator > (const dataDouble& b) const override {
+bool dataDouble::operator > (const dataDouble& b) const {
 	return std::stod(value) > std::stod(b.value);
 }
 
-bool dataDouble::operator == (const dataDouble& b) const override {
+bool dataDouble::operator == (const dataDouble& b) const {
 	return std::stod(value) == std::stod(b.value);
 }
 
-bool dataString::operator < (const dataString& b) const override {
+bool dataString::operator < (const dataString& b) const {
 	return stringToLower(value) < stringToLower(b.value);
 }
 
-bool dataString::operator > (const dataString& b) const override {
+bool dataString::operator > (const dataString& b) const {
 	return stringToLower(value) > stringToLower(b.value);
 }
 
-bool dataString::operator == (const dataString& b) const override {
+bool dataString::operator == (const dataString& b) const {
 	return stringToLower(value) == stringToLower(b.value);
 }
 

@@ -18,27 +18,27 @@ class dataInt : public data_t
 {
 public:
 	using data_t::data_t;
-	bool operator < (const dataInt&) const override;
-	bool operator > (const dataInt&) const override;
-	bool operator == (const dataInt&) const override;
+	bool operator < (const dataInt&) const;
+	bool operator > (const dataInt&) const;
+	bool operator == (const dataInt&) const;
 };
 
 class dataDouble : public data_t
 {
 public:
 	using data_t::data_t;
-	bool operator < (const dataDouble&) const override;
-	bool operator > (const dataDouble&) const override;
-	bool operator == (const dataDouble&) const override;
+	bool operator < (const dataDouble&) const;
+	bool operator > (const dataDouble&) const;
+	bool operator == (const dataDouble&) const;
 };
 
 class dataString : public data_t
 {
 public:
 	using data_t::data_t;
-	bool operator < (const dataString&) const override;
-	bool operator > (const dataString&) const override;
-	bool operator == (const dataString&) const override;
+	bool operator < (const dataString&) const;
+	bool operator > (const dataString&) const;
+	bool operator == (const dataString&) const;
 };
 
 std::string stringToLower(std::string);

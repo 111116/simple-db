@@ -24,11 +24,11 @@ private:
 		//int width;
 		type_t type;
 		std::string name;
-		bool nonNull = false;
+		bool nonNull;
 		std::string typeName() const;
 	};
 	std::vector<attr_t> attr;
-	std::unordered_map<std::string, unsigned> attrindex;
+	std::unordered_map<std::string, unsigned> attrIndex;
 	std::vector<Entry> data;
 	int primaryAttr = -1;
 
@@ -39,7 +39,7 @@ private:
 	Entry buildEntry(std::string attrlist, std::string datalist);
 
 public:
-	Table(std::string);
+	Table(std::string attrClause);
 
 	int insert(std::string attrName, std::string attrValue);
 	int remove();
@@ -48,7 +48,7 @@ public:
 	int update(std::string setClause, std::string whereClause);
 	int select(std::string attrName);
 	int select(std::string attrName, std::string whereClause);
-	int filter(std::string whereClause, Table& result)
+	int filter(std::string whereClause, Table& result);
 
 	void show(std::ostream& = std::cout);
 };

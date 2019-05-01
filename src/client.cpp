@@ -10,8 +10,9 @@ void create(std::string dbName)
 
 void drop(std::string dbName)
 {
-	if (dbList.count(dbName){
-		delete dbList[dbName].second;
+	if (dbList.count(dbName))
+	{
+		delete dbList[dbName];
 		dbList.erase(dbName);
 	}
 }
@@ -99,14 +100,14 @@ int main()
 			auto& tableName = str2;
 			read(); getchar();
 			std::string setClause;
-			std::getline(std:cin, setClause);
+			std::getline(std::cin, setClause);
 			auto t = stringToLower(setClause).find("where");
 			if (t == setClause.npos)
 				selected->table[tableName]->update(setClause);
 			else {
 				auto whereClause = setClause.substr(t + 6, (setClause.size() - 1) - (t + 6) + 1);
 				setClause = setClause.substr(0, t - 1);
-				selected->table[tableName]->update(setClause, WhereClause);
+				selected->table[tableName]->update(setClause, whereClause);
 			}
 			
 		}
