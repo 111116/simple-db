@@ -10,8 +10,10 @@ void create(std::string dbName)
 
 void drop(std::string dbName)
 {
-	delete dbList[dbName].second;
-	dbList.erase(dbName);
+	if (dbList.count(dbName){
+		delete dbList[dbName].second;
+		dbList.erase(dbName);
+	}
 }
 
 void use(std::string dbName)
@@ -35,20 +37,12 @@ std::string read()
 	return str;
 }
 
-std::string trans(std::string str)
-{
-	for (int i = 0; i < str.size(); i++)
-		if (str[i] >= 'A' && str[i] <= 'Z')
-			str[i] += 'a' - 'A';
-	return str;
-}
-
 int main()
 {
 	while (true)
 	{
 		auto str1 = read(), str2 = read();
-		auto st1 = trans(str1), st2 = trans(str2);
+		auto st1 = stringToLower(str1), st2 = stringToLower(str2);
 		
 		if (st1 == "create" && st2 == "database")
 			create(read());
@@ -92,7 +86,7 @@ int main()
 			auto tableName = read();
 			std::string whereClause;
 			std::getline(std::cin, whereClause);
-			auto t = trans(whereClause).find("where");
+			auto t = stringToLower(whereClause).find("where");
 			if (t == whereClause.npos)
 				selected->table[tableName]->remove();
 			else {
@@ -106,7 +100,7 @@ int main()
 			read(); getchar();
 			std::string setClause;
 			std::getline(std:cin, setClause);
-			auto t = trans(setClause).find("where");
+			auto t = stringToLower(setClause).find("where");
 			if (t == setClause.npos)
 				selected->table[tableName]->update(setClause);
 			else {
@@ -123,7 +117,7 @@ int main()
 			auto tableName = read();
 			std::string whereClause;
 			std::getline(std::cin, whereClause);
-			auto t = trans(whereClause).find("where");
+			auto t = stringToLower(whereClause).find("where");
 			if (t == whereClause.npos)
 				selected->table[tableName]->select(attrName);
 			else {
