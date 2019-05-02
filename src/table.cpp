@@ -76,16 +76,27 @@ Table::Table(std::string attrClause)
  * @param Condition (single operation)
  * @return Boolean filter function based on this condition string.
 */
-cond_t Table::atomCond(const tokens&)
+cond_t Table::atomCond(const tokens& cond)
 {
-	std::string operand1;
-	std::string operation;
-	std::string operand2;
-	// TODO parse
+	// TODO currently not concatenating consecutive strings
+	if (tokens.size() != 3)
+		throw "unrecognized condition";
+	const std::string& operand1 = cond[0];
+	const std::string& operation = cond[1];
+	const std::string& operand2 = cond[2];
+
 	int index1 = attrIndex.count(operand1)? attrIndex[operand1]: -1;
 	int index2 = attrIndex.count(operand2)? attrIndex[operand2]: -1;
+
+	// extract operation
 	std::function<bool(const data_t&, const data_t&)> op;
-	// TODO convert op
+	if (operation == "<")
+		op = std::less<data_t>();
+	else if (operation == ">")
+		op = std::greater<data_t>();
+	else if (operation == "=")
+		op = [](const data_t& a, const data_t& b){return a==b;};
+	else throw "unrecognized condition";
 
 	if (index1 == -1 && index2 == -1) // all literals
 	{
