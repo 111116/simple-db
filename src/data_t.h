@@ -8,6 +8,7 @@ class data_t
 //protected:
 //	std::string value;
 public:
+	virtual ~data_t();
 	static data_t* fromLiteral(std::string);
 	virtual bool operator < (const data_t&) const = 0;
 	virtual bool operator > (const data_t&) const = 0;
