@@ -47,12 +47,24 @@ bool dataString::operator < (const data_t &b) const
 
 #undef compareHelper
 
+/**
+ * Converts a string to lowercase.
+ *
+ * @param String to convert
+ * @return Lowercase string
+*/
 std::string stringToLower(std::string str)
 {
 	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 	return str;
 }
 
+/**
+ * Returns a data_t pointer from a string literal.
+ *
+ * @param A string literal
+ * @return A derived data_t pointer storing according value
+*/
 data_t* data_t::fromLiteral(std::string str)
 {
 	if (str[0] == '\'' || str[0] == '\"')
@@ -64,8 +76,15 @@ data_t* data_t::fromLiteral(std::string str)
 			long long value = 0, flag = 1;
 			for (unsigned i = 0; i < str.length(); ++i)
 			{
-				if (str[i] == '-') flag = -flag;
-				else (value *= 10) += str[i] - '0';
+				if (str[i] == '-' && i == 0)
+					flag = -flag;
+				else if (!isdigit(str[i])) // Not a digit => not an int
+				{
+					value = 1ll << 60; // This value is obviously not an int
+					break; // Break to get a double from this literal
+				}
+				else
+					(value *= 10) += str[i] - '0';
 			}
 			value *= flag;
 			if (value >= (int)0x80000000 && value <= (int)0x7fffffff)
