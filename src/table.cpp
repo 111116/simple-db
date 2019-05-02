@@ -29,7 +29,7 @@ std::string Table::attr_t::typeName() const
 /**
  * Table constructor
  * attrlist format: (attrName1 Type1, ..., attrNameN TypeN NOT NULL, PRIMARY KEY(attrName1))
- * 
+ *
  * @param attrlist
 */
 Table::Table(std::string attrClause)
@@ -37,7 +37,7 @@ Table::Table(std::string attrClause)
 	attrClause += ',';
 	std::vector<std::string> str;
 	str.push_back("");
-	std::string primaryKey; 
+	std::string primaryKey;
 	for (auto c: attrClause){
 		if (c == ' ' || c == '(' || c == ')')
 		{
@@ -53,7 +53,7 @@ Table::Table(std::string attrClause)
 				else
 				{
 					str[1] = stringToLower(str[1]);
-					type tmp;
+					type_t tmp;
 					if (str[1] == "integer") tmp = type_t::INTEGER;
 					if (str[1] == "double") tmp = type_t::DOUBLE;
 					if (str[1] == "string") tmp = type_t::STRING;
@@ -65,14 +65,14 @@ Table::Table(std::string attrClause)
 			}
 		else str.back() += c;
 	}
-	if (!PrimaryKey.empty())
+	if (!primaryKey.empty())
 		primaryAttr = attrIndex[primaryKey];
 }
 
 
 /**
  * Makes a boolean entry filter function with the string specified.
- * 
+ *
  * @param Condition (single operation)
  * @return Boolean filter function based on this condition string.
 */
@@ -84,7 +84,7 @@ cond_t Table::atomCond(std::string)
 	// TODO parse
 	int index1 = attrIndex.count(operand1)? attrIndex[operand1]: -1;
 	int index2 = attrIndex.count(operand2)? attrIndex[operand2]: -1;
-	
+
 	return [=](Entry& entry)
 	{
 		(index1==-1? )
@@ -95,7 +95,7 @@ cond_t Table::atomCond(std::string)
 
 /**
  * Makes a boolean entry filter function with the string specified.
- * 
+ *
  * @param Condition
  * @return Boolean filter function based on this condition string.
 */
@@ -107,7 +107,7 @@ cond_t Table::buildCond(std::string)
 
 /**
  * Makes a entry modifier function with the string specified.
- * 
+ *
  * @param Operation
  * @return modifier function based on this operation string.
 */
@@ -119,7 +119,7 @@ set_t Table::buildSet(std::string)
 
 /**
  * Makes an entry with the string specified.
- * 
+ *
  * @param attribute list (unparsed)
  * @param data list (unparsed)
  * @return entry constructed.
@@ -132,7 +132,7 @@ Entry Table::buildEntry(std::string attrlist, std::string datalist)
 
 /**
  * Inserts an entry to this table.
- * 
+ *
  * @param list of attribute names
  * @param list of attribute values
  * @return Number of entries inserted
@@ -146,7 +146,7 @@ int Table::insert(std::string attrName, std::string attrValue)
 
 /**
  * Deletes entries which satisfy condition ${cond} from this table.
- * 
+ *
  * @param Delete condition
  * @return Number of entries deleted
 */
@@ -164,7 +164,7 @@ int Table::remove(std::string whereClause);
 
 /**
  * Updates all entries with ${setClause}.
- * 
+ *
  * @param Update method (as a function)
  * @return Number of entries updated
 */
@@ -179,7 +179,7 @@ int Table::update(std::string setClause)
 
 /**
  * Updates entries which satisfy condition ${cond} with data ${set}.
- * 
+ *
  * @param Update method (as a function)
  * @param Update condition
  * @return Number of entries updated
@@ -226,7 +226,7 @@ int Table::select(std::string attrName, std::string whereClause)
 
 /**
  * Selects entries which satisfy condition ${cond}, and puts the result into ${result} as a new table.
- * 
+ *
  * @param Select condition
  * @param Table for select result
  * @return Number of entries selected
@@ -246,7 +246,7 @@ int Table::filter(std::string whereClause, Table& result)
 
 /**
  * Lists columns of this table.
- * 
+ *
  * @param Stream for output
 */
 void Table::show(std::ostream& o)

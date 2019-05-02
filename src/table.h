@@ -15,12 +15,12 @@
 class Table
 {
 private:
+	enum type_t
+	{
+		INTEGER, DOUBLE, STRING
+	};
 	struct attr_t
 	{
-		enum type_t
-		{
-			INTEGER, DOUBLE, STRING
-		};
 		//int width;
 		type_t type;
 		std::string name;

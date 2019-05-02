@@ -44,7 +44,7 @@ int main()
 	{
 		auto str1 = read(), str2 = read();
 		auto st1 = stringToLower(str1), st2 = stringToLower(str2);
-		
+
 		if (st1 == "create" && st2 == "database")
 			create(read());
 		if (st1 == "drop" && st2 == "database")
@@ -109,7 +109,7 @@ int main()
 				setClause = setClause.substr(0, t - 1);
 				selected->table[tableName]->update(setClause, whereClause);
 			}
-			
+
 		}
 		if (st1 == "select")
 		{
