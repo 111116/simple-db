@@ -3,6 +3,8 @@
 #include <string>
 #include <algorithm>
 
+class badTypeComparison {};
+
 class data_t
 {
 protected:
@@ -17,29 +19,31 @@ public:
 
 class dataInt: public data_t
 {
+	friend class dataDouble;
 public:
 	using data_t::data_t;
-	bool operator < (const dataInt&) const;
-	bool operator > (const dataInt&) const;
-	bool operator == (const dataInt&) const;
+	bool operator < (const data_t&) const;
+	bool operator > (const data_t&) const;
+	bool operator == (const data_t&) const;
 };
 
 class dataDouble: public data_t
 {
+	friend class dataInt;
 public:
 	using data_t::data_t;
-	bool operator < (const dataDouble&) const;
-	bool operator > (const dataDouble&) const;
-	bool operator == (const dataDouble&) const;
+	bool operator < (const data_t&) const;
+	bool operator > (const data_t&) const;
+	bool operator == (const data_t&) const;
 };
 
 class dataString: public data_t
 {
 public:
 	using data_t::data_t;
-	bool operator < (const dataString&) const;
-	bool operator > (const dataString&) const;
-	bool operator == (const dataString&) const;
+	bool operator < (const data_t&) const;
+	bool operator > (const data_t&) const;
+	bool operator == (const data_t&) const;
 };
 
 std::string stringToLower(std::string);

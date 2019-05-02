@@ -2,40 +2,44 @@
 
 data_t::data_t(std::string value) : value(value) {}
 
-bool dataInt::operator < (const dataInt& b) const {
-	return std::stoi(value) < std::stoi(b.value);
+bool data_t::operator > (const data_t& b) const
+{
+	return b < *this;
 }
 
-bool dataInt::operator > (const dataInt& b) const {
-	return std::stoi(value) > std::stoi(b.value);
+bool data_t::operator == (const data_t& b) const
+{
+	return !(*this < b) && !(b < *this);
 }
 
-bool dataInt::operator == (const dataInt& b) const {
-	return std::stoi(value) == std::stoi(b.value);
+bool dataInt::operator < (const data_t &b) const
+{
+	const dataInt* dint = dynamic_cast<const dataInt*>(&b);
+	if (dint)
+		return std::stoi(value) < std::stoi(dint->value);
+	const dataDouble* ddouble = dynamic_cast<const dataDouble*>(&b);
+	if (ddouble)
+		return std::stod(value) < std::stod(ddouble->value);
+	throw badTypeComparison();
 }
 
-bool dataDouble::operator < (const dataDouble& b) const {
-	return std::stod(value) < std::stod(b.value);
+bool dataDouble::operator < (const data_t &b) const
+{
+	const dataInt* dint = dynamic_cast<const dataInt*>(&b);
+	if (dint)
+		return std::stod(value) < std::stod(dint->value);
+	const dataDouble* ddouble = dynamic_cast<const dataDouble*>(&b);
+	if (ddouble)
+		return std::stod(value) < std::stod(ddouble->value);
+	throw badTypeComparison();
 }
 
-bool dataDouble::operator > (const dataDouble& b) const {
-	return std::stod(value) > std::stod(b.value);
-}
-
-bool dataDouble::operator == (const dataDouble& b) const {
-	return std::stod(value) == std::stod(b.value);
-}
-
-bool dataString::operator < (const dataString& b) const {
-	return stringToLower(value) < stringToLower(b.value);
-}
-
-bool dataString::operator > (const dataString& b) const {
-	return stringToLower(value) > stringToLower(b.value);
-}
-
-bool dataString::operator == (const dataString& b) const {
-	return stringToLower(value) == stringToLower(b.value);
+bool dataString::operator < (const data_t &b) const
+{
+	const dataString* dstring = dynamic_cast<const dataString*>(&b);
+	if (dstring)
+		return stringToLower(value) < stringToLower(dstring->value);
+	throw badTypeComparison();
 }
 
 std::string stringToLower(std::string str)
