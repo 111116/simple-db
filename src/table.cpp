@@ -132,21 +132,42 @@ cond_t Table::atomCond(const tokens& cond)
 */
 cond_t Table::buildCond(const tokens&)
 {
-
+	cond_t stack0 = constCond(false);
+	cond_t stack1 = constCond(true);
+	auto last = tokens.begin();
+	for (auto p = tokens.begin(); p != tokens.begin(); ++p)
+	{
+		if (stringToLower(*p) == "AND")
+		{
+			stack1 &= atomCond(tokens(last,p));
+			last = p;
+		}
+		if (stringToLower(*p) == "OR")
+		{
+			stack0 |= stack1 && atomCond(tokens(last,p));
+			stack1 = constCond(true);
+			last = p;
+		}
+	}
+	auto p = tokens.end();
+	stack0 |= stack1 && atomCond(tokens(last,p));
+	stack1 = constCond(true);
 }
 
 
 
-cond_t Table::atomSet(const tokens&)
+cond_t Table::atomSet(const tokens& cond)
 {
-	std::string attrName;
-	std::string attExpression;
-	// TODO parse
+	if (tokens.size() != 3 || tokens[1] != "=")
+		throw "unrecognized set";
+	const std::string& attrName = cond[0];
+	const std::string& attExpression = cond[2];;
+
 	if (!attrIndex.count(attrName))
 		throw "no such attr";
 	int index = attrIndex[operand1];
 	std::shared_ptr<data_t> val (data_t::fromLiteral(attExpression));
-	// change fromLiteral to evaluate at stage 2
+	// TODO change fromLiteral to evaluate
 	return [=](Entry& e)
 	{
 		e[index] = val;
@@ -161,9 +182,10 @@ cond_t Table::atomSet(const tokens&)
  * @param Operation
  * @return modifier function based on this operation string.
 */
-set_t Table::buildSet(const tokens&)
+set_t Table::buildSet(const tokens& cond)
 {
-
+	// currently only handling one-value assignment
+	return atomSet(cond);
 }
 
 
@@ -176,8 +198,7 @@ set_t Table::buildSet(const tokens&)
 */
 Entry Table::buildEntry(const tokens& attrName, const tokens& dataValue)
 {
-	std::vector<std::string> names;
-	std::vector<std::string> values;
+	
 	// TODO parse
 	Entry entry(attr.size(), nullptr);
 	for (int i=0; i<names.size(); ++i)
