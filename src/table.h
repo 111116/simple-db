@@ -13,6 +13,8 @@
 #include "cond_t.h"
 #include "set_t.h"
 
+typedef std::vector<std::string> tokens;
+
 class Table
 {
 private:
@@ -33,23 +35,23 @@ private:
 	std::vector<Entry> data;
 	int primaryAttr = -1;
 
-	cond_t atomCond(std::string);
-	cond_t atomSet(std::string);
-	cond_t buildCond(std::string);
-	set_t buildSet(std::string);
-	Entry buildEntry(std::string attrName, std::string dataValue);
+	cond_t atomCond(const tokens&);
+	cond_t atomSet(const tokens&);
+	cond_t buildCond(const tokens&);
+	set_t buildSet(const tokens&);
+	Entry buildEntry(const tokens& attrName, const tokens& dataValue);
 
 public:
 	Table(std::string attrClause);
 
-	int insert(std::string attrName, std::string attrValue);
+	int insert(const tokens& attrName, const tokens& attrValue);
 	int remove();
-	int remove(std::string whereClause);
-	int update(std::string setClause);
-	int update(std::string setClause, std::string whereClause);
-	int select(std::string attrName);
-	int select(std::string attrName, std::string whereClause);
-	int filter(std::string whereClause, Table& result);
+	int remove(const tokens& whereClause);
+	int update(const tokens& setClause);
+	int update(const tokens& setClause, const tokens& whereClause);
+	int select(const tokens& attrName);
+	int select(const tokens& attrName, const tokens& whereClause);
+	int filter(const tokens& whereClause, Table& result);
 
 	void show(std::ostream& = std::cout);
 };
