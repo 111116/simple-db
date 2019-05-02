@@ -237,28 +237,62 @@ int Table::update(std::string setClause, std::string whereClause)
 
 int Table::select(std::string attrName)
 {
-	if (!attrIndex.count(attrName))
-		throw "no such attr";
-	int index = attrIndex[attrName];
-	for (Entry& e: data)
-		e[index].print();
+	if (attrName == "*")
+	{
+		for (int i = 0; i < attr.size() - 1; ++i)
+			std::cout << attr[i].name << "\t";
+		std::cout << attr[attr.size() - 1].name << std::endl;
+		for (Entry& e: data)
+		{
+			for (int i = 0; i < e.size() - 1; ++i)
+				std::cout << e[i].get() << "\t";
+			std::cout << e[e.size() - 1].get() << std::endl;
+		}
+	}
+	else
+	{
+		if (!attrIndex.count(attrName))
+			throw "no such attr";
+		std::cout << attrName << std::endl;
+		int index = attrIndex[attrName];
+		for (Entry& e: data)
+			std::cout << e[index] << std::endl;
+	}
 	return data.size();
 }
 
 
 int Table::select(std::string attrName, std::string whereClause)
 {
-	if (!attrIndex.count(attrName))
-		throw "no such attr";
-	int index = attrIndex[attrName];
-	cond_t cond = buildCond(whereClause);
 	int entriesAffected = 0;
-	for (Entry& e: data)
-		if (cond(e))
-		{
-			e[index].print();
-			++entriesAffected;
-		}
+	cond_t cond = buildCond(whereClause);
+	if (attrName == "*")
+	{
+		for (int i = 0; i < attr.size() - 1; ++i)
+			std::cout << attr[i].name << "\t";
+		std::cout << attr[attr.size() - 1].name << std::endl;
+		for (Entry& e: data)
+			if (cond(e))
+			{
+				for (int i = 0; i < e.size() - 1; ++i)
+					std::cout << e[i].get() << "\t";
+				std::cout << e[e.size() - 1].get() << std::endl;
+				++entriesAffected;
+			}
+	}
+	else
+	{
+		if (!attrIndex.count(attrName))
+			throw "no such attr";
+		std::cout << attrName << std::endl;
+		int index = attrIndex[attrName];
+		for (Entry& e: data)
+			if (cond(e))
+			{
+				std::cout << e[index] << std::endl;
+				++entriesAffected;
+			}
+	}
 	return entriesAffected;
 }
 

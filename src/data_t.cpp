@@ -47,6 +47,11 @@ bool dataString::operator < (const data_t &b) const
 
 #undef compareHelper
 
+std::string& get() const
+{
+	return value;
+}
+
 /**
  * Converts a string to lowercase.
  *
