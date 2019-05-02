@@ -34,7 +34,7 @@ std::vector<std::string> split(std::string raw)
 				{
 					current += stringDelimiter;
 					i++;
-					current += raw[i];
+				//	current += raw[i];
 				}
 				else // end of a string literal
 				{
