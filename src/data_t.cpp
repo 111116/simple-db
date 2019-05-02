@@ -12,35 +12,40 @@ bool data_t::operator == (const data_t& b) const
 	return !(*this < b) && !(b < *this);
 }
 
+/**
+ * Macro for data comparison, work together with `bool operator<()`.
+ *
+ * @param Actual dataType for the right operand.
+ * @param Conversion used to get primitive value for the operands. If no conversion is needed, just simply omit this parameter.
+*/
+#define compareHelper(dataType, convertFunction) \
+{ \
+	const dataType* dvar = dynamic_cast<const dataType*>(&b); \
+	if (dvar) \
+		return convertFunction(value) < convertFunction(dvar->value); \
+}
+
 bool dataInt::operator < (const data_t &b) const
 {
-	const dataInt* dint = dynamic_cast<const dataInt*>(&b);
-	if (dint)
-		return std::stoi(value) < std::stoi(dint->value);
-	const dataDouble* ddouble = dynamic_cast<const dataDouble*>(&b);
-	if (ddouble)
-		return std::stod(value) < std::stod(ddouble->value);
+	compareHelper(dataInt, std::stoi);
+	compareHelper(dataDouble, std::stod);
 	throw badTypeComparison();
 }
 
 bool dataDouble::operator < (const data_t &b) const
 {
-	const dataInt* dint = dynamic_cast<const dataInt*>(&b);
-	if (dint)
-		return std::stod(value) < std::stod(dint->value);
-	const dataDouble* ddouble = dynamic_cast<const dataDouble*>(&b);
-	if (ddouble)
-		return std::stod(value) < std::stod(ddouble->value);
+	compareHelper(dataInt, std::stod);
+	compareHelper(dataDouble, std::stod);
 	throw badTypeComparison();
 }
 
 bool dataString::operator < (const data_t &b) const
 {
-	const dataString* dstring = dynamic_cast<const dataString*>(&b);
-	if (dstring)
-		return stringToLower(value) < stringToLower(dstring->value);
+	compareHelper(dataString, stringToLower);
 	throw badTypeComparison();
 }
+
+#undef compareHelper
 
 std::string stringToLower(std::string str)
 {
