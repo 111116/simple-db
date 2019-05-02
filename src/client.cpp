@@ -1,7 +1,5 @@
-#include <map>
-#include <string>
-
 #include "client.h"
+#include "tools.h"
 
 void create(std::string dbName)
 {
@@ -29,101 +27,89 @@ void show()
 		std::cout << t.first << std::endl;
 }
 
-std::string read()
-{
-	std::string str;
-	std::cin >> str;
-	if (str.back() == ';')
-		str.pop_back();
-	return str;
-}
-
 int main()
 {
-	while (true)
+	std::string input;
+	while (getline(std::cin, input))
 	{
-		auto str1 = read(), str2 = read();
-		auto st1 = stringToLower(str1), st2 = stringToLower(str2);
-
-		if (st1 == "create" && st2 == "database")
-			create(read());
-		if (st1 == "drop" && st2 == "database")
-			drop(read());
-		if (st1 == "use" && str2 != "table")
-			use(str2);
-		if (st1 == "show" && st2 == "databases")
+		auto str = split(input), strLower = str;
+		std::transform(strLower.begin(), strLower.end(), strLower.begin(), ::stringToLower);
+		
+		if (str.size() < 2) continue;
+		
+		if (strLower[0] == "create" && strLower[1] == "database")
+			create(str[2]);
+		if (strLower[0] == "drop" && strLower[1] == "database")
+			drop(str[2]);
+		if (strLower[0] == "use" && strLower[1] != "tables")
+			use(str[1]);
+		if (strLower[0] == "show" && strLower[1] == "databases")
 			show();
-
-		if (st1 == "create" && st2 == "table")
+		
+		if (strLower[0] == "create" && strLower[1] == "table")
 		{
-			auto str = read();
-			auto t = str.find('(');
-			auto tableName = str.substr(0, t);
-			auto traits = str.substr(t + 1, str.size() - t - 2);
+			auto& tableName = str[2];
+			auto traits = tokens(str.begin() + 4, str.end() - 2);
 			selected->create(tableName, traits);
 		}
-		if (st1 == "drop" && st2 == "table")
-			selected->drop(read());
-		if (st1 == "show" && st2 == "tables")
+		if (strLower[0] == "drop" && strLower[1] == "table")
+		{
+			auto& tableName = str[2];
+			selected->drop(tableName);
+		}
+		if (strLower[0] == "show" && strLower[1] == "tables")
 			selected->show();
-		if (st1 == "show" && st2 == "columns")
+		if (strLower[0] == "show" && strLower[1] == "columns")
 		{
-			read();
-			selected->show(read());
+			auto& tableName = str[3];
+			selected->show(tableName);
 		}
-
-		if (st1 == "insert" && st2 == "into")
+		
+		if (strLower[0] == "insert" && strLower[1] == "into")
 		{
-			auto str = read();
-			auto t = str.find('(');
-			auto tableName = str.substr(0, t);
-			auto attrlist = str.substr(t + 1, (str.size() - 2) - (t + 1) + 1);
-			read();
-			auto datalist = str.substr(1, str.size() - 2);
-			selected->table[tableName]->insert(attrlist, datalist);
+			auto& tableName = str[2];
+			auto t = find(strLower.begin(), strLower.end(), "values") - strLower.begin();
+			auto attrName = tokens(str.begin() + 4, str.begin() + t - 1);
+			auto attrValue = tokens(str.begin() + t + 2, str.end() - 2);
+			selected->table[tableName]->insert(attrName, attrValue);
 		}
-		if (st1 == "delete" && st2 == "from")
+		if (strLower[0] == "delete" && strLower[1] == "from")
 		{
-			auto tableName = read();
-			std::string whereClause;
-			std::getline(std::cin, whereClause);
-			auto t = stringToLower(whereClause).find("where");
-			if (t == whereClause.npos)
+			auto& tableName = str[2];
+			auto t = find(strLower.begin(), strLower.end(), "where") - strLower.begin();
+			if (t == strLower.size())
 				selected->table[tableName]->remove();
-			else {
-				whereClause = whereClause.substr(t + 6, (whereClause.size() - 1) - (t + 6) + 1);
-				selected->table[tableName]->remove(whereClause);
+			else
+			{
+				auto whereClause = tokens(str.begin() + t + 1, str.end() - 1);
+				selected->table[tableName]->remove(whereClause); 
 			}
 		}
-		if (st1 == "update")
+		if (strLower[0] == "update")
 		{
-			auto& tableName = str2;
-			read(); getchar();
-			std::string setClause;
-			std::getline(std::cin, setClause);
-			auto t = stringToLower(setClause).find("where");
-			if (t == setClause.npos)
+			auto& tableName = str[1];
+			auto t = find(strLower.begin(), strLower.end(), "where") - strLower.begin();
+			auto setClause = tokens(str.begin() + 3, str.begin() + t); 
+			if (t == strLower.size())
 				selected->table[tableName]->update(setClause);
-			else {
-				auto whereClause = setClause.substr(t + 6, (setClause.size() - 1) - (t + 6) + 1);
-				setClause = setClause.substr(0, t - 1);
+			else
+			{
+				auto whereClause = tokens(str.begin() + t + 1, str.end() - 1);
 				selected->table[tableName]->update(setClause, whereClause);
 			}
-
 		}
-		if (st1 == "select")
+		if (strLower[0] == "select")
 		{
-			auto& attrName = str2;
-			read();
-			auto tableName = read();
-			std::string whereClause;
-			std::getline(std::cin, whereClause);
-			auto t = stringToLower(whereClause).find("where");
-			if (t == whereClause.npos)
+			auto p = find(strLower.begin(), strLower.end(), "from") - strLower.begin();
+			auto attrName = tokens(str.begin() + 1, str.begin() + p);
+			auto& tableName = str[p + 1];
+			auto t = find(strLower.begin(), strLower.end(), "where") - strLower.begin();
+			if (t == strLower.size())
 				selected->table[tableName]->select(attrName);
-			else {
-				whereClause = whereClause.substr(t + 6, (whereClause.size() - 1) - (t + 6) + 1);
-				selected->table[tableName]->select(whereClause);
+			else
+			{
+				auto whereClause = tokens(str.begin() + t + 1, str.end() - 1);
+				selected->table[tableName]->select(attrName, whereClause);
 			}
 		}
 	}
