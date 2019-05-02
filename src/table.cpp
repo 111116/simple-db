@@ -256,7 +256,7 @@ int Table::select(std::string attrName)
 		std::cout << attrName << std::endl;
 		int index = attrIndex[attrName];
 		for (Entry& e: data)
-			std::cout << e[index] << std::endl;
+			std::cout << e[index].get() << std::endl;
 	}
 	return data.size();
 }
@@ -289,7 +289,7 @@ int Table::select(std::string attrName, std::string whereClause)
 		for (Entry& e: data)
 			if (cond(e))
 			{
-				std::cout << e[index] << std::endl;
+				std::cout << e[index].get() << std::endl;
 				++entriesAffected;
 			}
 	}
