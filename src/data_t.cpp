@@ -67,6 +67,7 @@ data_t* data_t::fromLiteral(std::string str)
 				if (str[i] == '-') flag = -flag;
 				else (value *= 10) += str[i] - '0';
 			}
+			value *= flag;
 			if (value >= (int)0x80000000 && value <= (int)0x7fffffff)
 				return new dataInt(str);
 		}
