@@ -36,7 +36,7 @@ private:
 	cond_t atomSet(std::string);
 	cond_t buildCond(std::string);
 	set_t buildSet(std::string);
-	Entry buildEntry(std::string attrlist, std::string datalist);
+	Entry buildEntry(std::string attrName, std::string dataValue);
 
 public:
 	Table(std::string attrClause);
