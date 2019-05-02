@@ -84,6 +84,21 @@ std::string& get() const
 	return value;
 }*/
 
+std::string dataInt::get() const
+{
+	return std::to_string(value);
+}
+
+std::string dataDouble::get() const
+{
+	return std::to_string(value);
+}
+
+std::string dataString::get() const
+{
+	return value;
+}
+
 /**
  * Converts a string to lowercase.
  *

@@ -12,7 +12,7 @@ public:
 	virtual bool operator < (const data_t&) const = 0;
 	virtual bool operator > (const data_t&) const = 0;
 	virtual bool operator == (const data_t&) const = 0;
-	std::string& get() const;
+	virtual std::string get() const;
 };
 
 class dataInt: public data_t
@@ -27,6 +27,7 @@ public:
 	bool operator < (const data_t&) const;
 	bool operator > (const data_t&) const;
 	bool operator == (const data_t&) const;
+	virtual std::string get() const;
 };
 
 class dataDouble: public data_t
@@ -41,6 +42,7 @@ public:
 	bool operator < (const data_t&) const;
 	bool operator > (const data_t&) const;
 	bool operator == (const data_t&) const;
+	virtual std::string get() const;
 };
 
 class dataString: public data_t
@@ -53,6 +55,7 @@ public:
 	bool operator < (const data_t&) const;
 	bool operator > (const data_t&) const;
 	bool operator == (const data_t&) const;
+	virtual std::string get() const;
 };
 
 std::string stringToLower(std::string);

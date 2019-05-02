@@ -97,17 +97,17 @@ cond_t Table::atomCond(std::string)
 	}
 	if (index1 != -1 && index2 != -1) // all variables
 	{
-		return [=](const Entry& e) { return op(e[index1], e[index2]); };
+		return [=](const Entry& e) { return op(*e[index1], *e[index2]); };
 	}
 	if (index1 != -1 && index2 == -1) // var - literal
 	{
 		std::shared_ptr<data_t> val2 (data_t::fromLiteral(operand2));
-		return [=](const Entry& e) { return op(e[index1], *val2); };
+		return [=](const Entry& e) { return op(*e[index1], *val2); };
 	}
 	if (index1 == -1 && index2 != -1) // literal - var
 	{
 		std::shared_ptr<data_t> val1 (data_t::fromLiteral(operand1));
-		return [=](const Entry& e) { return op(*val1, e[index2]); };
+		return [=](const Entry& e) { return op(*val1, *e[index2]); };
 	}
 }
 
@@ -138,7 +138,7 @@ cond_t Table::atomSet(std::string)
 	// change fromLiteral to evaluate at stage 2
 	return [=](Entry& e)
 	{
-		e[index] = *val;
+		e[index] = val;
 	};
 }
 
@@ -170,7 +170,7 @@ Entry Table::buildEntry(std::string attrName, std::string dataValue)
 	// TODO parse
 	Entry entry(attr.size(), nullptr);
 	for (int i=0; i<names.size(); ++i)
-		entry[attrIndex[name[i]]] = data_t::fromLiteral(values[i]);
+		entry[attrIndex[names[i]]] = data_t::fromLiteral(values[i]);
 	return entry;
 }
 
@@ -254,13 +254,6 @@ int Table::update(std::string setClause, std::string whereClause)
 
 int Table::select(std::string attrName)
 {
-<<<<<<< HEAD
-	if (!attrIndex.count(attrName))
-		throw "no such attr";
-	int index = attrIndex[attrName];
-	for (Entry& e: data)
-		e[index]->print();
-=======
 	if (attrName == "*")
 	{
 		for (int i = 0; i < attr.size() - 1; ++i)
@@ -269,8 +262,8 @@ int Table::select(std::string attrName)
 		for (Entry& e: data)
 		{
 			for (int i = 0; i < e.size() - 1; ++i)
-				std::cout << e[i].get() << "\t";
-			std::cout << e[e.size() - 1].get() << std::endl;
+				std::cout << e[i]->get() << "\t";
+			std::cout << e[e.size() - 1]->get() << std::endl;
 		}
 	}
 	else
@@ -282,27 +275,12 @@ int Table::select(std::string attrName)
 		for (Entry& e: data)
 			std::cout << e[index] << std::endl;
 	}
->>>>>>> 37b3b3c3bc5c23b004dc1b8f04f0e5a2bda68a1b
 	return data.size();
 }
 
 
 int Table::select(std::string attrName, std::string whereClause)
 {
-<<<<<<< HEAD
-	if (!attrIndex.count(attrName))
-		throw "no such attr";
-	int index = attrIndex[attrName];
-	cond_t cond = buildCond(whereClause);
-	int entriesSelected = 0;
-	for (Entry& e: data)
-		if (cond(e))
-		{
-			e[index]->print();
-			++entriesSelected;
-		}
-	return entriesSelected;
-=======
 	int entriesAffected = 0;
 	cond_t cond = buildCond(whereClause);
 	if (attrName == "*")
@@ -314,8 +292,8 @@ int Table::select(std::string attrName, std::string whereClause)
 			if (cond(e))
 			{
 				for (int i = 0; i < e.size() - 1; ++i)
-					std::cout << e[i].get() << "\t";
-				std::cout << e[e.size() - 1].get() << std::endl;
+					std::cout << e[i]->get() << "\t";
+				std::cout << e[e.size() - 1]->get() << std::endl;
 				++entriesAffected;
 			}
 	}
@@ -333,7 +311,6 @@ int Table::select(std::string attrName, std::string whereClause)
 			}
 	}
 	return entriesAffected;
->>>>>>> 37b3b3c3bc5c23b004dc1b8f04f0e5a2bda68a1b
 }
 
 
