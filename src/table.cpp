@@ -182,6 +182,17 @@ int Table::insert(std::string attrName, std::string attrValue)
 	return 1;
 }
 
+/**
+ * Clears all entries in this table, but preserving table structure.
+ *
+ * @return Number of entries deleted
+*/
+int Table::remove()
+{
+	int entriesRemoved = std::distance(data.begin(), data.end());
+	data.clear();
+	return entriesRemoved;
+}
 
 /**
  * Deletes entries which satisfy condition ${cond} from this table.
@@ -189,7 +200,7 @@ int Table::insert(std::string attrName, std::string attrValue)
  * @param Delete condition
  * @return Number of entries deleted
 */
-int Table::remove(std::string whereClause);
+int Table::remove(std::string whereClause)
 {
 	cond_t cond = buildCond(whereClause);
 	auto iter = std::remove_if(data.begin(), data.end(), cond);
@@ -237,29 +248,86 @@ int Table::update(std::string setClause, std::string whereClause)
 
 int Table::select(std::string attrName)
 {
+<<<<<<< HEAD
 	if (!attrIndex.count(attrName))
 		throw "no such attr";
 	int index = attrIndex[attrName];
 	for (Entry& e: data)
-		e[index].print();
+		e[index]->print();
+=======
+	if (attrName == "*")
+	{
+		for (int i = 0; i < attr.size() - 1; ++i)
+			std::cout << attr[i].name << "\t";
+		std::cout << attr[attr.size() - 1].name << std::endl;
+		for (Entry& e: data)
+		{
+			for (int i = 0; i < e.size() - 1; ++i)
+				std::cout << e[i].get() << "\t";
+			std::cout << e[e.size() - 1].get() << std::endl;
+		}
+	}
+	else
+	{
+		if (!attrIndex.count(attrName))
+			throw "no such attr";
+		std::cout << attrName << std::endl;
+		int index = attrIndex[attrName];
+		for (Entry& e: data)
+			std::cout << e[index] << std::endl;
+	}
+>>>>>>> 37b3b3c3bc5c23b004dc1b8f04f0e5a2bda68a1b
 	return data.size();
 }
 
 
 int Table::select(std::string attrName, std::string whereClause)
 {
+<<<<<<< HEAD
 	if (!attrIndex.count(attrName))
 		throw "no such attr";
 	int index = attrIndex[attrName];
 	cond_t cond = buildCond(whereClause);
-	int entriesAffected = 0;
+	int entriesSelected = 0;
 	for (Entry& e: data)
 		if (cond(e))
 		{
-			e[index].print();
-			++entriesAffected;
+			e[index]->print();
+			++entriesSelected;
 		}
+	return entriesSelected;
+=======
+	int entriesAffected = 0;
+	cond_t cond = buildCond(whereClause);
+	if (attrName == "*")
+	{
+		for (int i = 0; i < attr.size() - 1; ++i)
+			std::cout << attr[i].name << "\t";
+		std::cout << attr[attr.size() - 1].name << std::endl;
+		for (Entry& e: data)
+			if (cond(e))
+			{
+				for (int i = 0; i < e.size() - 1; ++i)
+					std::cout << e[i].get() << "\t";
+				std::cout << e[e.size() - 1].get() << std::endl;
+				++entriesAffected;
+			}
+	}
+	else
+	{
+		if (!attrIndex.count(attrName))
+			throw "no such attr";
+		std::cout << attrName << std::endl;
+		int index = attrIndex[attrName];
+		for (Entry& e: data)
+			if (cond(e))
+			{
+				std::cout << e[index] << std::endl;
+				++entriesAffected;
+			}
+	}
 	return entriesAffected;
+>>>>>>> 37b3b3c3bc5c23b004dc1b8f04f0e5a2bda68a1b
 }
 
 
@@ -278,7 +346,7 @@ int Table::filter(std::string whereClause, Table& result)
 	result.data.clear();
 	cond_t cond = buildCond(whereClause);
 	for (Entry& e: data)
-		if (cond(e)) result.insert(e);
+		if (cond(e)) result.data.push_back(e);
 	return result.data.size();
 }
 
