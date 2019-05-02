@@ -10,7 +10,7 @@ cond_t constCond(bool value)
 {
 	return [=](const Entry& x)
 	{
-		value;
+		return value;
 	};
 }
 
