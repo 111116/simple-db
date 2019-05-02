@@ -90,8 +90,8 @@ cond_t Table::atomCond(std::string)
 	if (index1 == -1 && index2 == -1) // all literals
 	{
 		// conversion should throw exception if not literal
-		std::shared_ptr<data_t> val1 (fromLiteral(operand1));
-		std::shared_ptr<data_t> val2 (fromLiteral(operand2));
+		std::shared_ptr<data_t> val1 (data_t::fromLiteral(operand1));
+		std::shared_ptr<data_t> val2 (data_t::fromLiteral(operand2));
 		bool result = op(*val1, *val2);
 		return [=](const Entry&) { return result; };
 	}
@@ -101,12 +101,12 @@ cond_t Table::atomCond(std::string)
 	}
 	if (index1 != -1 && index2 == -1) // var - literal
 	{
-		std::shared_ptr<data_t> val2 (fromLiteral(operand2));
+		std::shared_ptr<data_t> val2 (data_t::fromLiteral(operand2));
 		return [=](const Entry& e) { return op(e[index1], *val2); };
 	}
 	if (index1 == -1 && index2 != -1) // literal - var
 	{
-		std::shared_ptr<data_t> val1 (fromLiteral(operand1));
+		std::shared_ptr<data_t> val1 (data_t::fromLiteral(operand1));
 		return [=](const Entry& e) { return op(*val1, e[index2]); };
 	}
 }
@@ -134,7 +134,7 @@ cond_t Table::atomSet(std::string)
 	if (!attrIndex.count(attrName))
 		throw "no such attr";
 	int index = attrIndex[operand1];
-	std::shared_ptr<data_t> val (fromLiteral(attExpression));
+	std::shared_ptr<data_t> val (data_t::fromLiteral(attExpression));
 	// change fromLiteral to evaluate at stage 2
 	return [=](Entry& e)
 	{
@@ -163,9 +163,15 @@ set_t Table::buildSet(std::string)
  * @param data list (unparsed)
  * @return entry constructed.
 */
-Entry Table::buildEntry(std::string attrlist, std::string datalist)
+Entry Table::buildEntry(std::string attrName, std::string dataValue)
 {
-
+	std::vector<std::string> names;
+	std::vector<std::string> values;
+	// TODO parse
+	Entry entry(attr.size(), nullptr);
+	for (int i=0; i<names.size(); ++i)
+		entry[attrIndex[name[i]]] = data_t::fromLiteral(values[i]);
+	return entry;
 }
 
 
