@@ -155,7 +155,9 @@ cond_t Table::buildCond(const tokens&)
 }
 
 
-
+/**
+ * Makes a entry modifier (one-value assignment) with the string specified.
+*/
 cond_t Table::atomSet(const tokens& cond)
 {
 	if (tokens.size() != 3 || tokens[1] != "=")
@@ -299,6 +301,13 @@ int Table::update(const tokens& setClause, const tokens& whereClause)
 
 
 
+/**
+ * print specified column (data field)
+ * pass {"*"} as first argument to print all columns
+ *
+ * @param column specified
+ * @return Number of entries printed
+*/
 int Table::select(const tokens& attrName)
 {
 	if (attrName == "*")
@@ -326,6 +335,14 @@ int Table::select(const tokens& attrName)
 }
 
 
+/**
+ * print specified column (data field) of entries that satisfy a condition
+ * pass {"*"} as first argument to print all columns
+ *
+ * @param column specified
+ * @param condition
+ * @return Number of entries printed
+*/
 int Table::select(const tokens& attrName, const tokens& whereClause)
 {
 	int entriesAffected = 0;
