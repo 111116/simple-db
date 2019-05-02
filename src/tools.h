@@ -2,9 +2,8 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
 
-// return readline (splited)
+// split a string
 std::vector<std::string> split(std::string raw)
 {
 	raw.push_back('\n');
@@ -34,7 +33,6 @@ std::vector<std::string> split(std::string raw)
 				{
 					current += stringDelimiter;
 					i++;
-				//	current += raw[i];
 				}
 				else // end of a string literal
 				{
