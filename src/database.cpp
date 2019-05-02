@@ -15,7 +15,7 @@ Database::~Database()
  * @param Name of the table to be created
  * @param Columns with data types and constraints
 */
-void Database::create(std::string tableName, std::string traits)
+void Database::create(std::string tableName, const tokens& traits)
 {
 	table[tableName] = new Table(traits);
 }

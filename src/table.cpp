@@ -76,7 +76,7 @@ Table::Table(std::string attrClause)
  * @param Condition (single operation)
  * @return Boolean filter function based on this condition string.
 */
-cond_t Table::atomCond(std::string)
+cond_t Table::atomCond(const tokens&)
 {
 	std::string operand1;
 	std::string operation;
@@ -119,14 +119,14 @@ cond_t Table::atomCond(std::string)
  * @param Condition
  * @return Boolean filter function based on this condition string.
 */
-cond_t Table::buildCond(std::string)
+cond_t Table::buildCond(const tokens&)
 {
 
 }
 
 
 
-cond_t Table::atomSet(std::string)
+cond_t Table::atomSet(const tokens&)
 {
 	std::string attrName;
 	std::string attExpression;
@@ -150,7 +150,7 @@ cond_t Table::atomSet(std::string)
  * @param Operation
  * @return modifier function based on this operation string.
 */
-set_t Table::buildSet(std::string)
+set_t Table::buildSet(const tokens&)
 {
 
 }
@@ -163,7 +163,7 @@ set_t Table::buildSet(std::string)
  * @param data list (unparsed)
  * @return entry constructed.
 */
-Entry Table::buildEntry(std::string attrName, std::string dataValue)
+Entry Table::buildEntry(const tokens& attrName, const tokens& dataValue)
 {
 	std::vector<std::string> names;
 	std::vector<std::string> values;
@@ -182,7 +182,7 @@ Entry Table::buildEntry(std::string attrName, std::string dataValue)
  * @param list of attribute values
  * @return Number of entries inserted
 */
-int Table::insert(std::string attrName, std::string attrValue)
+int Table::insert(const tokens& attrName, const tokens& attrValue)
 {
 	data.push_back(buildEntry(attrName, attrValue));
 	return 1;
@@ -206,7 +206,7 @@ int Table::remove()
  * @param Delete condition
  * @return Number of entries deleted
 */
-int Table::remove(std::string whereClause)
+int Table::remove(const tokens& whereClause)
 {
 	cond_t cond = buildCond(whereClause);
 	auto iter = std::remove_if(data.begin(), data.end(), cond);
@@ -224,7 +224,7 @@ int Table::remove(std::string whereClause)
  * @param Update method (as a function)
  * @return Number of entries updated
 */
-int Table::update(std::string setClause)
+int Table::update(const tokens& setClause)
 {
 	set_t set = buildSet(setClause);
 	for (Entry& e: data)
@@ -240,7 +240,7 @@ int Table::update(std::string setClause)
  * @param Update condition
  * @return Number of entries updated
 */
-int Table::update(std::string setClause, std::string whereClause)
+int Table::update(const tokens& setClause, const tokens& whereClause)
 {
 	set_t set = buildSet(setClause);
 	cond_t cond = buildCond(whereClause);
@@ -252,7 +252,7 @@ int Table::update(std::string setClause, std::string whereClause)
 
 
 
-int Table::select(std::string attrName)
+int Table::select(const tokens& attrName)
 {
 	if (attrName == "*")
 	{
@@ -279,7 +279,7 @@ int Table::select(std::string attrName)
 }
 
 
-int Table::select(std::string attrName, std::string whereClause)
+int Table::select(const tokens& attrName, const tokens& whereClause)
 {
 	int entriesAffected = 0;
 	cond_t cond = buildCond(whereClause);
@@ -321,7 +321,7 @@ int Table::select(std::string attrName, std::string whereClause)
  * @param Table for select result
  * @return Number of entries selected
 */
-int Table::filter(std::string whereClause, Table& result)
+int Table::filter(const tokens& whereClause, Table& result)
 {
 	result.attr = this->attr;
 	result.attrIndex = this->attrIndex;
