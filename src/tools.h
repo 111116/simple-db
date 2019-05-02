@@ -5,13 +5,9 @@
 #include <iostream>
 
 // return readline (splited)
-std::vector<std::string> splitInput(std::istream& inputStream = std::cin)
+std::vector<std::string> split(std::string raw)
 {
-	// get raw input
-	std::string raw;
-	std::getline(inputStream, raw);
 	raw.push_back('\n');
-
 	std::vector<std::string> res;
 	std::string current;
 	bool inString = false;
