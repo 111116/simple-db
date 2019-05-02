@@ -182,6 +182,17 @@ int Table::insert(std::string attrName, std::string attrValue)
 	return 1;
 }
 
+/**
+ * Clears all entries in this table, but preserving table structure.
+ *
+ * @return Number of entries deleted
+*/
+int Table::remove()
+{
+	int entriesRemoved = std::distance(data.begin(), data.end());
+	data.clear();
+	return entriesRemoved;
+}
 
 /**
  * Deletes entries which satisfy condition ${cond} from this table.
@@ -189,7 +200,7 @@ int Table::insert(std::string attrName, std::string attrValue)
  * @param Delete condition
  * @return Number of entries deleted
 */
-int Table::remove(std::string whereClause);
+int Table::remove(std::string whereClause)
 {
 	cond_t cond = buildCond(whereClause);
 	auto iter = std::remove_if(data.begin(), data.end(), cond);
@@ -241,7 +252,7 @@ int Table::select(std::string attrName)
 		throw "no such attr";
 	int index = attrIndex[attrName];
 	for (Entry& e: data)
-		e[index].print();
+		e[index]->print();
 	return data.size();
 }
 
@@ -252,14 +263,14 @@ int Table::select(std::string attrName, std::string whereClause)
 		throw "no such attr";
 	int index = attrIndex[attrName];
 	cond_t cond = buildCond(whereClause);
-	int entriesAffected = 0;
+	int entriesSelected = 0;
 	for (Entry& e: data)
 		if (cond(e))
 		{
-			e[index].print();
-			++entriesAffected;
+			e[index]->print();
+			++entriesSelected;
 		}
-	return entriesAffected;
+	return entriesSelected;
 }
 
 
@@ -278,7 +289,7 @@ int Table::filter(std::string whereClause, Table& result)
 	result.data.clear();
 	cond_t cond = buildCond(whereClause);
 	for (Entry& e: data)
-		if (cond(e)) result.insert(e);
+		if (cond(e)) result.data.push_back(e);
 	return result.data.size();
 }
 
