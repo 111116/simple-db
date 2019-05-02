@@ -191,6 +191,9 @@ set_t Table::buildSet(const tokens& cond)
 
 /**
  * Makes an entry with the string specified.
+ * in example: INSERT INTO oop_info(stu_id, stu_name) VALUES (2018011343, "a");
+ * attrName = {"stu_id", ",", "stu_name"}
+ * dataValue = {"2018011343", ",", "\"a\""}
  *
  * @param attribute list (unparsed)
  * @param data list (unparsed)
@@ -198,11 +201,23 @@ set_t Table::buildSet(const tokens& cond)
 */
 Entry Table::buildEntry(const tokens& attrName, const tokens& dataValue)
 {
-	
-	// TODO parse
-	Entry entry(attr.size(), nullptr);
-	for (int i=0; i<names.size(); ++i)
-		entry[attrIndex[names[i]]] = data_t::fromLiteral(values[i]);
+	int n = attrName.size();
+	if (n%2==0 || n!=dataValue.size())
+		throw "Table::buildEntry: unrecognized format";
+	// attrName & dataValue should contain alternating string & comma
+	Entry entry((n+1)/2, nullptr);
+	for (int i=0; i<n; ++i)
+	{
+		if (i%2 == 0)
+		{
+			entry[attrIndex[names[i]]] = data_t::fromLiteral(values[i]);
+		}
+		else
+		{
+			if (entry[i] != ",")
+				throw "Table::buildEntry: unrecognized format";
+		}
+	}
 	return entry;
 }
 
