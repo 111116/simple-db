@@ -41,7 +41,7 @@ bool dataDouble::operator < (const data_t &b) const
 
 bool dataString::operator < (const data_t &b) const
 {
-	compareHelper(dataString, stringToLower);
+	compareHelper(dataString, ); // String compare is case-sensitive (different from MySQL default), so here we don't need to convert lowercase
 	throw badTypeComparison();
 }
 
