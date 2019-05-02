@@ -248,17 +248,42 @@ int Table::update(std::string setClause, std::string whereClause)
 
 int Table::select(std::string attrName)
 {
+<<<<<<< HEAD
 	if (!attrIndex.count(attrName))
 		throw "no such attr";
 	int index = attrIndex[attrName];
 	for (Entry& e: data)
 		e[index]->print();
+=======
+	if (attrName == "*")
+	{
+		for (int i = 0; i < attr.size() - 1; ++i)
+			std::cout << attr[i].name << "\t";
+		std::cout << attr[attr.size() - 1].name << std::endl;
+		for (Entry& e: data)
+		{
+			for (int i = 0; i < e.size() - 1; ++i)
+				std::cout << e[i].get() << "\t";
+			std::cout << e[e.size() - 1].get() << std::endl;
+		}
+	}
+	else
+	{
+		if (!attrIndex.count(attrName))
+			throw "no such attr";
+		std::cout << attrName << std::endl;
+		int index = attrIndex[attrName];
+		for (Entry& e: data)
+			std::cout << e[index] << std::endl;
+	}
+>>>>>>> 37b3b3c3bc5c23b004dc1b8f04f0e5a2bda68a1b
 	return data.size();
 }
 
 
 int Table::select(std::string attrName, std::string whereClause)
 {
+<<<<<<< HEAD
 	if (!attrIndex.count(attrName))
 		throw "no such attr";
 	int index = attrIndex[attrName];
@@ -271,6 +296,38 @@ int Table::select(std::string attrName, std::string whereClause)
 			++entriesSelected;
 		}
 	return entriesSelected;
+=======
+	int entriesAffected = 0;
+	cond_t cond = buildCond(whereClause);
+	if (attrName == "*")
+	{
+		for (int i = 0; i < attr.size() - 1; ++i)
+			std::cout << attr[i].name << "\t";
+		std::cout << attr[attr.size() - 1].name << std::endl;
+		for (Entry& e: data)
+			if (cond(e))
+			{
+				for (int i = 0; i < e.size() - 1; ++i)
+					std::cout << e[i].get() << "\t";
+				std::cout << e[e.size() - 1].get() << std::endl;
+				++entriesAffected;
+			}
+	}
+	else
+	{
+		if (!attrIndex.count(attrName))
+			throw "no such attr";
+		std::cout << attrName << std::endl;
+		int index = attrIndex[attrName];
+		for (Entry& e: data)
+			if (cond(e))
+			{
+				std::cout << e[index] << std::endl;
+				++entriesAffected;
+			}
+	}
+	return entriesAffected;
+>>>>>>> 37b3b3c3bc5c23b004dc1b8f04f0e5a2bda68a1b
 }
 
 

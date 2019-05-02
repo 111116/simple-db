@@ -12,6 +12,7 @@ public:
 	virtual bool operator < (const data_t&) const = 0;
 	virtual bool operator > (const data_t&) const = 0;
 	virtual bool operator == (const data_t&) const = 0;
+	std::string& get() const;
 };
 
 class dataInt: public data_t
