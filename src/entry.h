@@ -8,6 +8,7 @@ class Entry: public std::vector<data_t*>
 {
 public:
 	using std::vector<data_t*>::vector;
+	using std::vector<data_t*>::operator[];
 	Entry(const Entry&) = delete;
 	~Entry()
 	{

@@ -1,6 +1,38 @@
 #include "data_t.h"
 
-data_t::data_t(std::string value) : value(value) {}
+//data_t::data_t(std::string value) : value(value) {}
+
+dataInt::dataInt(int value): value(value) {}
+dataInt::dataInt(std::string value): value(std::stoi(value)) {}
+
+dataDouble::dataDouble(double value): value(value) {}
+dataDouble::dataDouble(std::string value): value(std::stod(value)) {}
+
+dataString::dataString(std::string str)
+{
+	value = "";
+	unsigned i = 0, j = str.length() - 1;
+	while (str[i] != '\'' && str[i] != '\"') ++i;
+	while (str[j] != str[i]) --j;
+	for (unsigned k = i + 1; k < j; ++k)
+	{
+		if (str[k] == '\\')
+		{
+			++k;
+			if (str[k] == '0') value.push_back('\0');
+			else if (str[k] == 'b') value.push_back('\b');
+			else if (str[k] == 'n') value.push_back('\n');
+			else if (str[k] == 'r') value.push_back('\r');
+			else if (str[k] == 't') value.push_back('\t');
+			else if (str[k] == 'Z') value.push_back('\x1a');
+			else value.push_back(str[k]);
+		}
+		else if (str[k] == str[i])
+			value.push_back(str[++k]);
+		else
+			value.push_back(str[k]);
+	}
+}
 
 bool data_t::operator > (const data_t& b) const
 {
@@ -27,30 +59,30 @@ bool data_t::operator == (const data_t& b) const
 
 bool dataInt::operator < (const data_t &b) const
 {
-	compareHelper(dataInt, std::stoi);
-	compareHelper(dataDouble, std::stod);
-	throw badTypeComparison();
+	compareHelper(dataInt, );
+	compareHelper(dataDouble, );
+	throw "Compare: data type mismatch";
 }
 
 bool dataDouble::operator < (const data_t &b) const
 {
-	compareHelper(dataInt, std::stod);
-	compareHelper(dataDouble, std::stod);
-	throw badTypeComparison();
+	compareHelper(dataInt, );
+	compareHelper(dataDouble, );
+	throw "Compare: data type mismatch";
 }
 
 bool dataString::operator < (const data_t &b) const
 {
 	compareHelper(dataString, ); // String compare is case-sensitive (different from MySQL default), so here we don't need to convert lowercase
-	throw badTypeComparison();
+	throw "Compare: data type mismatch";
 }
 
 #undef compareHelper
-
+/*
 std::string& get() const
 {
 	return value;
-}
+}*/
 
 /**
  * Converts a string to lowercase.
