@@ -20,7 +20,7 @@ table.o: table.cpp table.h entry.h data_t.h cond_t.h set_t.h
 tools.o: tools.cpp tools.h
 	$(CC) $(CFLAGS) -o tools.o -c tools.cpp
 
-entry.o: entry.cpp entry.h
+entry.o: entry.cpp entry.h data_t.h
 	$(CC) $(CFLAGS) -o entry.o -c entry.cpp
 
 cond_t.o: cond_t.cpp cond_t.h
