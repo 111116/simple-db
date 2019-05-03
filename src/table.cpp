@@ -381,7 +381,7 @@ void Table::show(std::ostream& o)
 	for (unsigned i = 0; i < attr.size(); ++i) {
 		const Table::attr_t& a = attr[i];
 		o << a.name << '\t' << a.typeName() << '\t'
-			<< (a.nonNull ? "YES" : "NO") << '\t'
+			<< (a.nonNull ? "NO" : "YES") << '\t'
 			<< (i == primaryAttr ? "PRI" : "") << "\tNULL" << "\t\n";
 	}
 }
