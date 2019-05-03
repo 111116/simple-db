@@ -8,6 +8,11 @@ Entry::~Entry()
 			delete p;
 }
 
+Entry::Entry(Entry&& e): std::vector<data_t*>(e)
+{
+	e.clear();
+}
+
 Entry& Entry::operator= (Entry&& e)
 {
 	for (auto p: *this)
