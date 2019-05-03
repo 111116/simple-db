@@ -79,7 +79,7 @@ Table::Table(std::string attrClause)
 cond_t Table::atomCond(const tokens& cond)
 {
 	// TODO currently not concatenating consecutive strings
-	if (tokens.size() != 3)
+	if (cond.size() != 3)
 		throw "unrecognized condition";
 	const std::string& operand1 = cond[0];
 	const std::string& operation = cond[1];
@@ -130,12 +130,12 @@ cond_t Table::atomCond(const tokens& cond)
  * @param Condition
  * @return Boolean filter function based on this condition string.
 */
-cond_t Table::buildCond(const tokens&)
+cond_t Table::buildCond(const tokens& cond)
 {
 	cond_t stack0 = constCond(false);
 	cond_t stack1 = constCond(true);
-	auto last = tokens.begin();
-	for (auto p = tokens.begin(); p != tokens.begin(); ++p)
+	auto last = cond.begin();
+	for (auto p = cond.begin(); p != cond.begin(); ++p)
 	{
 		if (stringToLower(*p) == "AND")
 		{
@@ -149,7 +149,7 @@ cond_t Table::buildCond(const tokens&)
 			last = p;
 		}
 	}
-	auto p = tokens.end();
+	auto p = cond.end();
 	stack0 |= stack1 && atomCond(tokens(last,p));
 	stack1 = constCond(true);
 }
@@ -158,21 +158,21 @@ cond_t Table::buildCond(const tokens&)
 /**
  * Makes a entry modifier (one-value assignment) with the string specified.
 */
-cond_t Table::atomSet(const tokens& cond)
+set_t Table::atomSet(const tokens& cond)
 {
-	if (tokens.size() != 3 || tokens[1] != "=")
+	if (cond.size() != 3 || cond[1] != "=")
 		throw "unrecognized set";
 	const std::string& attrName = cond[0];
-	const std::string& attExpression = cond[2];;
+	const std::string& attExpression = cond[2];
 
 	if (!attrIndex.count(attrName))
 		throw "no such attr";
-	int index = attrIndex[operand1];
+	int index = attrIndex[attrName];
 	std::shared_ptr<data_t> val (data_t::fromLiteral(attExpression));
 	// TODO change fromLiteral to evaluate
 	return [=](Entry& e)
 	{
-		e[index] = val;
+		e[index] = val.get();
 	};
 }
 
@@ -212,11 +212,11 @@ Entry Table::buildEntry(const tokens& attrName, const tokens& dataValue)
 	{
 		if (i%2 == 0)
 		{
-			entry[attrIndex[names[i]]] = data_t::fromLiteral(values[i]);
+			entry[attrIndex[attrName[i]]] = data_t::fromLiteral(dataValue[i]);
 		}
 		else
 		{
-			if (entry[i] != ",")
+			if (attrName[i] != "," || dataValue[i] != ",")
 				throw "Table::buildEntry: unrecognized format";
 		}
 	}
@@ -310,7 +310,7 @@ int Table::update(const tokens& setClause, const tokens& whereClause)
 */
 int Table::select(const tokens& attrName)
 {
-	if (attrName == "*")
+	if (attrName[0] == "*")
 	{
 		for (int i = 0; i < attr.size() - 1; ++i)
 			std::cout << attr[i].name << "\t";
@@ -324,10 +324,10 @@ int Table::select(const tokens& attrName)
 	}
 	else
 	{
-		if (!attrIndex.count(attrName))
+		if (!attrIndex.count(attrName[0]))
 			throw "no such attr";
-		std::cout << attrName << std::endl;
-		int index = attrIndex[attrName];
+		std::cout << attrName[0] << std::endl;
+		int index = attrIndex[attrName[0]];
 		for (Entry& e: data)
 			std::cout << e[index] << std::endl;
 	}
@@ -347,7 +347,7 @@ int Table::select(const tokens& attrName, const tokens& whereClause)
 {
 	int entriesAffected = 0;
 	cond_t cond = buildCond(whereClause);
-	if (attrName == "*")
+	if (attrName[0] == "*")
 	{
 		for (int i = 0; i < attr.size() - 1; ++i)
 			std::cout << attr[i].name << "\t";
@@ -363,10 +363,10 @@ int Table::select(const tokens& attrName, const tokens& whereClause)
 	}
 	else
 	{
-		if (!attrIndex.count(attrName))
+		if (!attrIndex.count(attrName[0]))
 			throw "no such attr";
-		std::cout << attrName << std::endl;
-		int index = attrIndex[attrName];
+		std::cout << attrName[0] << std::endl;
+		int index = attrIndex[attrName[0]];
 		for (Entry& e: data)
 			if (cond(e))
 			{

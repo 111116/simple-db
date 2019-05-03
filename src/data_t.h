@@ -58,5 +58,3 @@ public:
 	bool operator == (const data_t&) const;
 	virtual std::string get() const;
 };
-
-std::string stringToLower(std::string);

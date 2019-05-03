@@ -100,18 +100,6 @@ std::string dataString::get() const
 }
 
 /**
- * Converts a string to lowercase.
- *
- * @param String to convert
- * @return Lowercase string
-*/
-std::string stringToLower(std::string str)
-{
-	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-	return str;
-}
-
-/**
  * Returns a data_t pointer from a string literal.
  *
  * @param A string literal

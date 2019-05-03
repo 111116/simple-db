@@ -12,6 +12,7 @@
 #include "data_t.h"
 #include "cond_t.h"
 #include "set_t.h"
+#include "tools.h"
 
 typedef std::vector<std::string> tokens;
 
@@ -36,7 +37,7 @@ private:
 	int primaryAttr = -1;
 
 	cond_t atomCond(const tokens&);
-	cond_t atomSet(const tokens&);
+	set_t atomSet(const tokens&);
 	cond_t buildCond(const tokens&);
 	set_t buildSet(const tokens&);
 	Entry buildEntry(const tokens& attrName, const tokens& dataValue);
