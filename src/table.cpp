@@ -135,7 +135,7 @@ cond_t Table::buildCond(const tokens& cond)
 	cond_t stack0 = constCond(false);
 	cond_t stack1 = constCond(true);
 	auto last = cond.begin();
-	for (auto p = cond.begin(); p != cond.begin(); ++p)
+	for (auto p = cond.begin(); p != cond.end(); ++p)
 	{
 		if (stringToLower(*p) == "AND")
 		{
