@@ -77,7 +77,7 @@ int main()
 		{
 			auto& tableName = str[2];
 			auto t = find(strLower.begin(), strLower.end(), "where") - strLower.begin();
-			if (t == strLower.size())
+			if (t == (int)strLower.size())
 				selected->table[tableName]->remove();
 			else
 			{
@@ -90,7 +90,7 @@ int main()
 			auto& tableName = str[1];
 			auto t = find(strLower.begin(), strLower.end(), "where") - strLower.begin();
 			auto setClause = tokens(str.begin() + 3, str.begin() + t); 
-			if (t == strLower.size())
+			if (t == (int)strLower.size())
 				selected->table[tableName]->update(setClause);
 			else
 			{
@@ -101,10 +101,12 @@ int main()
 		if (strLower[0] == "select")
 		{
 			auto p = find(strLower.begin(), strLower.end(), "from") - strLower.begin();
-			auto attrName = tokens(str.begin() + 1, str.begin() + p);
 			auto& tableName = str[p + 1];
+			auto attrName = tokens(str.begin() + 1, str.begin() + p);
+			if (str[1] == "*")
+				attrName = selected->table[tableName]->attrList();
 			auto t = find(strLower.begin(), strLower.end(), "where") - strLower.begin();
-			if (t == strLower.size())
+			if (t == (int)strLower.size())
 				selected->table[tableName]->select(attrName);
 			else
 			{
