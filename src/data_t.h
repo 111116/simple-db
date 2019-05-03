@@ -51,6 +51,7 @@ private:
 	std::string value;
 public:
 	dataString(std::string);
+	dataString(const dataString&);
 	dataString* copy();
 	bool operator < (const data_t&) const;
 	using data_t::operator >;

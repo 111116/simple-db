@@ -8,6 +8,7 @@ dataInt::dataInt(std::string value): value(std::stoi(value)) {}
 dataDouble::dataDouble(double value): value(value) {}
 dataDouble::dataDouble(std::string value): value(std::stod(value)) {}
 
+dataString::dataString(const dataString& o): value(o.value) {}
 dataString::dataString(std::string str)
 {
 	value = "";
@@ -149,7 +150,7 @@ dataDouble* dataDouble::copy()
 
 dataString* dataString::copy()
 {
-	return new dataString(this->value);
+	return new dataString(*this);
 }
 
 data_t::~data_t() {}
