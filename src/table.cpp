@@ -219,7 +219,7 @@ set_t Table::buildSet(const tokens& cond)
 Entry Table::buildEntry(const tokens& attrName, const tokens& dataValue)
 {
 	int n = attrName.size();
-	if (n%2==0 || n!=dataValue.size())
+	if ((n!=0 && n%2==0) || n!=dataValue.size())
 		throw "Table::buildEntry: unrecognized format";
 	// attrName & dataValue should contain alternating string & comma
 	Entry entry(attr.size(), nullptr);
