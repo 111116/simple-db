@@ -96,7 +96,7 @@ cond_t Table::atomCond(const tokens& cond)
 		return [=](const Entry& e)
 		{
 			if (e[index1] == nullptr || e[index2] == nullptr)
-				throw nullptr;
+				return false;
 			return op(*e[index1], *e[index2]);
 		};
 	}
@@ -106,7 +106,7 @@ cond_t Table::atomCond(const tokens& cond)
 		return [=](const Entry& e)
 		{
 			if (e[index1] == nullptr)
-				throw nullptr;
+				return false;
 			return op(*e[index1], *val2);
 		};
 	}
@@ -116,7 +116,7 @@ cond_t Table::atomCond(const tokens& cond)
 		return [=](const Entry& e)
 		{
 			if (e[index2] == nullptr)
-				throw nullptr;
+				return false;
 			return op(*val1, *e[index2]);
 		};
 	}
@@ -154,18 +154,7 @@ cond_t Table::buildCond(const tokens& cond)
 			last = p+1;
 		}
 	}
-	stack0 |= stack1 && atomCond(tokens(last, cond.end()));
-	return [=](const Entry& e)
-	{
-		try
-		{
-			return stack0(e);
-		}
-		catch (void*)
-		{
-			return false;
-		}
-	};
+	return stack0 || stack1 && atomCond(tokens(last, cond.end()));
 }
 
 
