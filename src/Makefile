@@ -3,7 +3,7 @@ CFLAGS = -std=c++14 -O2
 
 .PHONY: all
 all: client.o data_t.o database.o table.o tools.o entry.o cond_t.o
-	$(CC) -O2 -o simple-db client.o data_t.o database.o table.o tools.o entry.o cond_t.o
+	$(CC) -O2 -o main client.o data_t.o database.o table.o tools.o entry.o cond_t.o
 
 client.o: client.cpp client.h tools.h database.h table.h entry.h data_t.h cond_t.h set_t.h
 	$(CC) $(CFLAGS) -o client.o -c client.cpp
@@ -28,4 +28,4 @@ cond_t.o: cond_t.cpp cond_t.h
 
 .PHONY: clean
 clean:
-	rm -f *.o simple-db
+	rm -f *.o main
