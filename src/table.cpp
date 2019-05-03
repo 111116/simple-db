@@ -72,6 +72,9 @@ Table::Table(const tokens& attrClause)
 cond_t Table::atomCond(const tokens& cond)
 {
 	// TODO currently not concatenating consecutive strings
+	puts("WTF");
+	for (auto s: cond)
+		std::cout << "    " << s << std::endl;
 	if (cond.size() != 3)
 		throw "unrecognized condition";
 	const std::string& operand1 = cond[0];
@@ -145,13 +148,13 @@ cond_t Table::buildCond(const tokens& cond)
 		if (stringToLower(*p) == "and")
 		{
 			stack1 &= atomCond(tokens(last,p));
-			last = p;
+			last = p+1;
 		}
 		if (stringToLower(*p) == "or")
 		{
 			stack0 |= stack1 && atomCond(tokens(last,p));
 			stack1 = constCond(true);
-			last = p;
+			last = p+1;
 		}
 	}
 	stack0 |= stack1 && atomCond(tokens(last, cond.end()));
