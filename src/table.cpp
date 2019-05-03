@@ -357,6 +357,11 @@ int Table::select(const tokens& attrName, const tokens& whereClause)
 	for (Entry& e: data)
 		if (cond(e))
 		{
+			if (entriesAffected == 0)
+			{
+				for (int i = 0; i < attrName.size(); ++i)
+					std::cout << attrName[i] << (i + 1 == attrName.size() ? '\n' : '\t');
+			}
 			for (int i = 0; i < attrName.size() - 1; ++i)
 				print(e[index[i]], '\t');
 			print(e[index.back()]);
