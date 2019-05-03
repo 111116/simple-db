@@ -153,5 +153,5 @@ data_t::~data_t() {}
 
 std::ostream& operator<<(std::ostream& o, const data_t& data)
 {
-	o << data.get();
+	return o << data.get();
 }
