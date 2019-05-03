@@ -5,13 +5,13 @@
 class data_t
 {
 public:
-	virtual ~data_t();
+//	virtual ~data_t();
 	static data_t* fromLiteral(std::string);
-	virtual data_t* copy();
+	virtual data_t* copy() = 0;
 	virtual bool operator < (const data_t&) const = 0;
-	virtual bool operator > (const data_t&) const = 0;
-	virtual bool operator == (const data_t&) const = 0;
-	virtual std::string get() const;
+	virtual bool operator > (const data_t&) const;
+	virtual bool operator == (const data_t&) const;
+	virtual std::string get() const = 0;
 };
 
 class dataInt: public data_t
@@ -24,8 +24,8 @@ public:
 	dataInt(std::string);
 	dataInt* copy();
 	bool operator < (const data_t&) const;
-	bool operator > (const data_t&) const;
-	bool operator == (const data_t&) const;
+	//bool operator > (const data_t&) const;
+	//bool operator == (const data_t&) const;
 	virtual std::string get() const;
 };
 
@@ -39,8 +39,8 @@ public:
 	dataDouble(std::string);
 	dataDouble* copy();
 	bool operator < (const data_t&) const;
-	bool operator > (const data_t&) const;
-	bool operator == (const data_t&) const;
+	//bool operator > (const data_t&) const;
+	//bool operator == (const data_t&) const;
 	virtual std::string get() const;
 };
 
@@ -52,7 +52,7 @@ public:
 	dataString(std::string);
 	dataString* copy();
 	bool operator < (const data_t&) const;
-	bool operator > (const data_t&) const;
-	bool operator == (const data_t&) const;
+	//bool operator > (const data_t&) const;
+	//bool operator == (const data_t&) const;
 	virtual std::string get() const;
 };

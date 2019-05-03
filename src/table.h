@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
 
 #include "entry.h"
 #include "data_t.h"
@@ -39,7 +40,7 @@ private:
 
 public:
 	Table(const tokens& attrClause);
-	
+
 	tokens attrList() const;
 	int insert(const tokens& attrName, const tokens& attrValue);
 	int remove();

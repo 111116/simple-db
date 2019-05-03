@@ -326,7 +326,7 @@ int Table::select(const tokens& attrName)
 			throw "no such attr";
 	for (int i = 0; i < attrName.size() - 1; ++i)
 		std::cout << attrName[i] << "\t";
-	std::cout << attrName.back() << std::endl; 
+	std::cout << attrName.back() << std::endl;
 	for (Entry& e: data)
 	{
 		for (int i = 0; i < attrName.size() - 1; ++i)
