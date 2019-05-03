@@ -98,14 +98,6 @@ cond_t Table::atomCond(const tokens& cond)
 		op = [](const data_t& a, const data_t& b){return a==b;};
 	else throw "unrecognized condition";
 
-	if (index1 == -1 && index2 == -1) // all literals
-	{
-		// conversion should throw exception if not literal
-		std::shared_ptr<data_t> val1 (data_t::fromLiteral(operand1));
-		std::shared_ptr<data_t> val2 (data_t::fromLiteral(operand2));
-		bool result = op(*val1, *val2);
-		return [=](const Entry&) { return result; };
-	}
 	if (index1 != -1 && index2 != -1) // all variables
 	{
 		return [=](const Entry& e) { return op(*e[index1], *e[index2]); };
@@ -120,6 +112,12 @@ cond_t Table::atomCond(const tokens& cond)
 		std::shared_ptr<data_t> val1 (data_t::fromLiteral(operand1));
 		return [=](const Entry& e) { return op(*val1, *e[index2]); };
 	}
+	// all literals
+	// conversion should throw exception if not literal
+	std::shared_ptr<data_t> val1 (data_t::fromLiteral(operand1));
+	std::shared_ptr<data_t> val2 (data_t::fromLiteral(operand2));
+	bool result = op(*val1, *val2);
+	return [=](const Entry&) { return result; };
 }
 
 
@@ -149,9 +147,7 @@ cond_t Table::buildCond(const tokens& cond)
 			last = p;
 		}
 	}
-	auto p = cond.end();
-	stack0 |= stack1 && atomCond(tokens(last,p));
-	stack1 = constCond(true);
+	return stack0 || stack1 && atomCond(tokens(last, cond.end()));
 }
 
 
@@ -375,26 +371,6 @@ int Table::select(const tokens& attrName, const tokens& whereClause)
 			}
 	}
 	return entriesAffected;
-}
-
-
-/**
- * Selects entries which satisfy condition ${cond}, and puts the result into ${result} as a new table.
- *
- * @param Select condition
- * @param Table for select result
- * @return Number of entries selected
-*/
-int Table::filter(const tokens& whereClause, Table& result)
-{
-	result.attr = this->attr;
-	result.attrIndex = this->attrIndex;
-	result.primaryAttr = this->primaryAttr;
-	result.data.clear();
-	cond_t cond = buildCond(whereClause);
-	for (Entry& e: data)
-		if (cond(e)) result.data.push_back(e);
-	return result.data.size();
 }
 
 
