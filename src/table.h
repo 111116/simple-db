@@ -43,8 +43,9 @@ private:
 	Entry buildEntry(const tokens& attrName, const tokens& dataValue);
 
 public:
-	Table(std::string attrClause);
-
+	Table(const tokens& attrClause);
+	
+	tokens attrList() const;
 	int insert(const tokens& attrName, const tokens& attrValue);
 	int remove();
 	int remove(const tokens& whereClause);

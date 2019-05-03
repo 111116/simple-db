@@ -32,43 +32,28 @@ std::string Table::attr_t::typeName() const
  *
  * @param attrlist
 */
-Table::Table(std::string attrClause)
+Table::Table(const tokens& attrClause)
 {
-	attrClause += ',';
-	std::vector<std::string> str;
-	str.push_back("");
 	std::string primaryKey;
-	for (auto c: attrClause){
-		if (c == ' ' || c == '(' || c == ')')
+	for (auto t = attrClause.begin(); t < attrClause.end(); )
+	{
+		auto p = find(t, attrClause.end(), ",");
+		if (p - t == 5)
+			primaryKey = *(t + 3);
+		else
 		{
-			if (!str.back().empty())
-				str.push_back("");
+			type_t type;
+			auto typeLower = stringToLower(*(t + 1));
+			if (typeLower == "integer") type = type_t::INTEGER;
+			if (typeLower == "double") type = type_t::DOUBLE;
+			if (typeLower == "string") type = type_t::STRING;
+			attr.push_back((attr_t){type, *t, (p - t) == 4});
 		}
-		else if (c == ',')
-			{
-				if (!str.back().empty())
-					str.push_back("");
-				if (str.size() == 4)
-					primaryKey = str[2];
-				else
-				{
-					str[1] = stringToLower(str[1]);
-					type_t tmp;
-					if (str[1] == "integer") tmp = type_t::INTEGER;
-					if (str[1] == "double") tmp = type_t::DOUBLE;
-					if (str[1] == "string") tmp = type_t::STRING;
-					attr.push_back((attr_t){tmp, str[0], str.size() == 5});
-					attrIndex[str[0]] = attr.size();
-				}
-				str.clear();
-				str.push_back("");
-			}
-		else str.back() += c;
+		t = p + 1;
 	}
 	if (!primaryKey.empty())
 		primaryAttr = attrIndex[primaryKey];
 }
-
 
 /**
  * Makes a boolean entry filter function with the string specified.
@@ -203,7 +188,7 @@ Entry Table::buildEntry(const tokens& attrName, const tokens& dataValue)
 	if (n%2==0 || n!=dataValue.size())
 		throw "Table::buildEntry: unrecognized format";
 	// attrName & dataValue should contain alternating string & comma
-	Entry entry((n+1)/2, nullptr);
+	Entry entry(attr.size(), nullptr);
 	for (int i=0; i<n; ++i)
 	{
 		if (i%2 == 0)
@@ -306,26 +291,17 @@ int Table::update(const tokens& setClause, const tokens& whereClause)
 */
 int Table::select(const tokens& attrName)
 {
-	if (attrName[0] == "*")
-	{
-		for (int i = 0; i < attr.size() - 1; ++i)
-			std::cout << attr[i].name << "\t";
-		std::cout << attr[attr.size() - 1].name << std::endl;
-		for (Entry& e: data)
-		{
-			for (int i = 0; i < e.size() - 1; ++i)
-				std::cout << e[i]->get() << "\t";
-			std::cout << e[e.size() - 1]->get() << std::endl;
-		}
-	}
-	else
-	{
-		if (!attrIndex.count(attrName[0]))
+	for (auto& x: attrName)
+		if (!attrIndex.count(x))
 			throw "no such attr";
-		std::cout << attrName[0] << std::endl;
-		int index = attrIndex[attrName[0]];
-		for (Entry& e: data)
-			std::cout << e[index] << std::endl;
+	for (int i = 0; i < attrName.size() - 1; ++i)
+		std::cout << attrName[i] << "\t";
+	std::cout << attrName.back() << std::endl; 
+	for (Entry& e: data)
+	{
+		for (int i = 0; i < attrName.size() - 1; ++i)
+			std::cout << e[attrIndex[attrName[i]]] << "\t";
+		std::cout << e[attrIndex[attrName.back()]] << std::endl;
 	}
 	return data.size();
 }
@@ -341,38 +317,29 @@ int Table::select(const tokens& attrName)
 */
 int Table::select(const tokens& attrName, const tokens& whereClause)
 {
+	for (auto& x: attrName)
+		if (!attrIndex.count(x))
+			throw "no such attr";
 	int entriesAffected = 0;
 	cond_t cond = buildCond(whereClause);
-	if (attrName[0] == "*")
-	{
-		for (int i = 0; i < attr.size() - 1; ++i)
-			std::cout << attr[i].name << "\t";
-		std::cout << attr[attr.size() - 1].name << std::endl;
-		for (Entry& e: data)
-			if (cond(e))
-			{
-				for (int i = 0; i < e.size() - 1; ++i)
-					std::cout << e[i]->get() << "\t";
-				std::cout << e[e.size() - 1]->get() << std::endl;
-				++entriesAffected;
-			}
-	}
-	else
-	{
-		if (!attrIndex.count(attrName[0]))
-			throw "no such attr";
-		std::cout << attrName[0] << std::endl;
-		int index = attrIndex[attrName[0]];
-		for (Entry& e: data)
-			if (cond(e))
-			{
-				std::cout << e[index] << std::endl;
-				++entriesAffected;
-			}
-	}
+	for (Entry& e: data)
+		if (cond(e))
+		{
+			for (int i = 0; i < attrName.size() - 1; ++i)
+				std::cout << e[attrIndex[attrName[i]]] << "\t";
+			std::cout << e[attrIndex[attrName.back()]] << std::endl;
+			++entriesAffected;
+		}
 	return entriesAffected;
 }
 
+tokens Table::attrList() const
+{
+	tokens res;
+	for (auto& x: attr)
+		res.push_back(x.name);
+	return res;
+}
 
 /**
  * Lists columns of this table.
