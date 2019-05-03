@@ -322,7 +322,7 @@ int Table::update(const tokens& setClause, const tokens& whereClause)
 */
 int Table::select(const tokens& attrName)
 {
-	select(attrName, split("1=1"));
+	return select(attrName, split("1=1"));
 }
 
 
