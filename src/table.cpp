@@ -321,19 +321,7 @@ int Table::update(const tokens& setClause, const tokens& whereClause)
 */
 int Table::select(const tokens& attrName)
 {
-	for (auto& x: attrName)
-		if (!attrIndex.count(x))
-			throw "no such attr";
-	for (int i = 0; i < attrName.size() - 1; ++i)
-		std::cout << attrName[i] << "\t";
-	std::cout << attrName.back() << std::endl; 
-	for (Entry& e: data)
-	{
-		for (int i = 0; i < attrName.size() - 1; ++i)
-			std::cout << e[attrIndex[attrName[i]]] << "\t";
-		std::cout << e[attrIndex[attrName.back()]] << std::endl;
-	}
-	return data.size();
+	select(attrName, split("1=1"));
 }
 
 
@@ -347,17 +335,20 @@ int Table::select(const tokens& attrName)
 */
 int Table::select(const tokens& attrName, const tokens& whereClause)
 {
+	std::vector<int> index;
 	for (auto& x: attrName)
 		if (!attrIndex.count(x))
 			throw "no such attr";
+		else
+			index.push_back(attrIndex[x]);
 	int entriesAffected = 0;
 	cond_t cond = buildCond(whereClause);
 	for (Entry& e: data)
 		if (cond(e))
 		{
 			for (int i = 0; i < attrName.size() - 1; ++i)
-				std::cout << e[attrIndex[attrName[i]]] << "\t";
-			std::cout << e[attrIndex[attrName.back()]] << std::endl;
+				std::cout << *e[index[i]] << "\t";
+			std::cout << *e[index.back()] << std::endl;
 			++entriesAffected;
 		}
 	return entriesAffected;
@@ -381,6 +372,8 @@ void Table::show(std::ostream& o)
 	o << "Field\tType\tNull\tKey\tDefault\tExtra\n";
 	for (unsigned i = 0; i < attr.size(); ++i) {
 		const Table::attr_t& a = attr[i];
-		o << a.name << '\t' << a.typeName() << '\t' << (a.nonNull ? "YES" : "NO") << '\t' << (i == primaryAttr ? "PRI" : "") << "\tNULL" << "\t\n";
+		o << a.name << '\t' << a.typeName() << '\t'
+			<< (a.nonNull ? "YES" : "NO") << '\t'
+			<< (i == primaryAttr ? "PRI" : "") << "\tNULL" << "\t\n";
 	}
 }
