@@ -148,3 +148,10 @@ dataString* dataString::copy()
 {
 	return new dataString(this->value);
 }
+
+data_t::~data_t() {}
+
+std::ostream& operator<<(std::ostream& o, const data_t& data)
+{
+	o << data.get();
+}
