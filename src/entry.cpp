@@ -13,7 +13,7 @@ Entry& Entry::operator= (Entry&& e)
 	for (auto p: *this)
 		if (p != nullptr)
 			delete p;
-	std::vector<data_t*>::operator= (static_cast<std::vector<data_t*>>(e));
+	std::vector<data_t*>::operator= (static_cast<std::vector<data_t*>&&>(e));
 	e.clear();
 	return *this;
 }
