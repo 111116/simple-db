@@ -60,6 +60,7 @@ Table::Table(const tokens& attrClause)
  *
  * @param Condition (single operation)
  * @return Boolean filter function based on this condition string.
+ * @exception nullptr / "unrecognized condition" / exceptions in fromLiteral
 */
 cond_t Table::atomCond(const tokens& cond)
 {
@@ -85,24 +86,38 @@ cond_t Table::atomCond(const tokens& cond)
 
 	if (index1 != -1 && index2 != -1) // all variables
 	{
-		return [=](const Entry& e) { return op(*e[index1], *e[index2]); };
+		return [=](const Entry& e)
+		{
+			if (e[index1] == nullptr || e[index2] == nullptr)
+				throw nullptr;
+			return op(*e[index1], *e[index2]);
+		};
 	}
 	if (index1 != -1 && index2 == -1) // var - literal
 	{
 		std::shared_ptr<data_t> val2 (data_t::fromLiteral(operand2));
-		return [=](const Entry& e) { return op(*e[index1], *val2); };
+		return [=](const Entry& e)
+		{
+			if (e[index1] == nullptr)
+				throw nullptr;
+			return op(*e[index1], *val2);
+		};
 	}
 	if (index1 == -1 && index2 != -1) // literal - var
 	{
 		std::shared_ptr<data_t> val1 (data_t::fromLiteral(operand1));
-		return [=](const Entry& e) { return op(*val1, *e[index2]); };
+		return [=](const Entry& e)
+		{
+			if (e[index2] == nullptr)
+				throw nullptr;
+			return op(*val1, *e[index2]);
+		};
 	}
 	// all literals
 	// conversion should throw exception if not literal
 	std::shared_ptr<data_t> val1 (data_t::fromLiteral(operand1));
 	std::shared_ptr<data_t> val2 (data_t::fromLiteral(operand2));
-	bool result = op(*val1, *val2);
-	return [=](const Entry&) { return result; };
+	return constCond(op(*val1, *val2));
 }
 
 
@@ -132,7 +147,18 @@ cond_t Table::buildCond(const tokens& cond)
 			last = p;
 		}
 	}
-	return stack0 || stack1 && atomCond(tokens(last, cond.end()));
+	stack0 |= stack1 && atomCond(tokens(last, cond.end()));
+	return [=](const Entry& e)
+	{
+		try
+		{
+			return stack0(e);
+		}
+		catch (void*)
+		{
+			return false;
+		}
+	};
 }
 
 
