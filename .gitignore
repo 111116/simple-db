@@ -2,3 +2,6 @@
 .vscode
 .gitignore
 *.o
+debug
+debug/*
+src/simple-db

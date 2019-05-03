@@ -53,6 +53,7 @@ Table::Table(const tokens& attrClause)
 			if (typeLower == "double") type = type_t::DOUBLE; else
 			if (typeLower == "char") type = type_t::STRING; else
 				throw "unrecognized data type";
+			attrIndex[*t] = attr.size();
 			attr.push_back((attr_t){type, *t, (p - t) == 4});
 		}
 		t = p + 1;
@@ -185,6 +186,7 @@ set_t Table::atomSet(const tokens& cond)
 	// TODO change fromLiteral to evaluate
 	return [=](Entry& e)
 	{
+		delete e[index];
 		e[index] = val.get();
 	};
 }
