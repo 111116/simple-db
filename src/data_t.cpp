@@ -11,7 +11,7 @@ dataDouble::dataDouble(std::string value): value(std::stod(value)) {}
 dataString::dataString(std::string str)
 {
 	value = "";
-	if (str[0] != '\'' || str.back() != '\"' || str[0] != str.back())
+	if ((str[0] != '\'' && str[0] != '\"') || str[0] != str.back())
 		throw "unrecognized string literal";
 	for (unsigned k = 1; k < str.size()-1; ++k)
 	{
