@@ -1,5 +1,6 @@
 #include <memory>
 #include <iostream>
+#include <algorithm>
 
 #include "table.h"
 #include "tools.h"
