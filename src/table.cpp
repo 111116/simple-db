@@ -72,9 +72,6 @@ Table::Table(const tokens& attrClause)
 cond_t Table::atomCond(const tokens& cond)
 {
 	// TODO currently not concatenating consecutive strings
-	puts("WTF");
-	for (auto s: cond)
-		std::cout << "    " << s << std::endl;
 	if (cond.size() != 3)
 		throw "unrecognized condition";
 	const std::string& operand1 = cond[0];
