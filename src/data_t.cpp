@@ -11,10 +11,9 @@ dataDouble::dataDouble(std::string value): value(std::stod(value)) {}
 dataString::dataString(std::string str)
 {
 	value = "";
-	unsigned i = 0, j = str.length() - 1;
-	while (str[i] != '\'' && str[i] != '\"') ++i;
-	while (str[j] != str[i]) --j;
-	for (unsigned k = i + 1; k < j; ++k)
+	if (str[0] != '\'' || str.back() != '\"' || str[0] != str.back())
+		throw "unrecognized string literal";
+	for (unsigned k = 1; k < str.size()-1; ++k)
 	{
 		if (str[k] == '\\')
 		{
@@ -27,8 +26,12 @@ dataString::dataString(std::string str)
 			else if (str[k] == 'Z') value.push_back('\x1a');
 			else value.push_back(str[k]);
 		}
-		else if (str[k] == str[i])
+		else if (str[k] == str[0])
+		{
+			if (k+1 == str.size()-1 || str[k+1] != str[0])
+				throw "unrecognized string literal";
 			value.push_back(str[++k]);
+		}
 		else
 			value.push_back(str[k]);
 	}
