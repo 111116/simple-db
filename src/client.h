@@ -1,7 +1,5 @@
 #pragma once
 
-#include <algorithm>
-
 #include "database.h"
 
 std::map<std::string, Database*> dbList;
