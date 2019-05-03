@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "client.h"
 #include "tools.h"
 

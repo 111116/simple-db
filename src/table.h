@@ -3,16 +3,11 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <functional>
-#include <memory>
-
-#include <iostream>
 
 #include "entry.h"
 #include "data_t.h"
 #include "cond_t.h"
 #include "set_t.h"
-#include "tools.h"
 
 typedef std::vector<std::string> tokens;
 

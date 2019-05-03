@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <algorithm>
 
 class data_t
 {

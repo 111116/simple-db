@@ -1,4 +1,8 @@
+#include <memory>
+#include <iostream>
+
 #include "table.h"
+#include "tools.h"
 
 /**
  * Returns attributes (data type, width, etc.) of this column in a string.
