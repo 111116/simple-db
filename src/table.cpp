@@ -49,7 +49,7 @@ Table::Table(const tokens& attrClause)
 		{
 			type_t type;
 			auto typeLower = stringToLower(*(t + 1));
-			if (typeLower == "integer") type = type_t::INTEGER; else
+			if (typeLower == "int") type = type_t::INTEGER; else
 			if (typeLower == "double") type = type_t::DOUBLE; else
 			if (typeLower == "char") type = type_t::STRING; else
 				throw "unrecognized data type";
