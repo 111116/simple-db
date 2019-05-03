@@ -133,3 +133,18 @@ data_t* data_t::fromLiteral(std::string str)
 		return new dataDouble(str);
 	}
 }
+
+dataInt* dataInt::copy()
+{
+	return new dataInt(this->value);
+}
+
+dataDouble* dataDouble::copy()
+{
+	return new dataDouble(this->value);
+}
+
+dataString* dataString::copy()
+{
+	return new dataString(this->value);
+}

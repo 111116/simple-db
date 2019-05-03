@@ -5,11 +5,10 @@
 
 class data_t
 {
-//protected:
-//	std::string value;
 public:
 	virtual ~data_t();
 	static data_t* fromLiteral(std::string);
+	virtual data_t* copy();
 	virtual bool operator < (const data_t&) const = 0;
 	virtual bool operator > (const data_t&) const = 0;
 	virtual bool operator == (const data_t&) const = 0;
@@ -22,9 +21,9 @@ class dataInt: public data_t
 private:
 	int value;
 public:
-	//using data_t::data_t;
 	dataInt(int);
 	dataInt(std::string);
+	dataInt* copy();
 	bool operator < (const data_t&) const;
 	bool operator > (const data_t&) const;
 	bool operator == (const data_t&) const;
@@ -37,9 +36,9 @@ class dataDouble: public data_t
 private:
 	double value;
 public:
-//	using data_t::data_t;
 	dataDouble(double);
 	dataDouble(std::string);
+	dataDouble* copy();
 	bool operator < (const data_t&) const;
 	bool operator > (const data_t&) const;
 	bool operator == (const data_t&) const;
@@ -51,8 +50,8 @@ class dataString: public data_t
 private:
 	std::string value;
 public:
-//	using data_t::data_t;
 	dataString(std::string);
+	dataString* copy();
 	bool operator < (const data_t&) const;
 	bool operator > (const data_t&) const;
 	bool operator == (const data_t&) const;
