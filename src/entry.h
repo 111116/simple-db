@@ -8,7 +8,7 @@ class Entry: public std::vector<data_t*>
 {
 public:
 	using std::vector<data_t*>::vector;
-//	Entry(const Entry&) = delete;
+	Entry(const Entry&) = delete;
 	~Entry()
 	{
 		for (auto p: *this)
