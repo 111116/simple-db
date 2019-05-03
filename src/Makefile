@@ -2,8 +2,8 @@ CC = g++
 CFLAGS = -std=c++14 -O2
 
 .PHONY: all
-all: client.o data_t.o database.o table.o tools.o entry.o
-	$(CC) -O2 -o simple-db client.o data_t.o database.o table.o tools.o entry.o
+all: client.o data_t.o database.o table.o tools.o entry.o cond_t.o
+	$(CC) -O2 -o simple-db client.o data_t.o database.o table.o tools.o entry.o cond_t.o
 
 client.o: client.cpp client.h tools.h database.h table.h entry.h data_t.h cond_t.h set_t.h
 	$(CC) $(CFLAGS) -o client.o -c client.cpp
@@ -22,6 +22,9 @@ tools.o: tools.cpp tools.h
 
 entry.o: entry.cpp entry.h
 	$(CC) $(CFLAGS) -o entry.o -c entry.cpp
+
+cond_t.o: cond_t.cpp cond_t.h
+	$(CC) $(CFLAGS) -o cond_t.o -c cond_t.cpp
 
 .PHONY: clean
 clean:
