@@ -32,6 +32,7 @@ void show()
 
 int main()
 {
+	try{
 	std::string input;
 	while (getline(std::cin, input))
 	{
@@ -117,5 +118,10 @@ int main()
 				selected->table[tableName]->select(attrName, whereClause);
 			}
 		}
+	}
+	}
+	catch(const char* s)
+	{
+		std::cerr << "Exception caught: " << s << std::endl;
 	}
 }
