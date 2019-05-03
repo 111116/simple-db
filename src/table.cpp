@@ -147,9 +147,7 @@ cond_t Table::buildCond(const tokens& cond)
 			last = p;
 		}
 	}
-	auto p = cond.end();
-	stack0 |= stack1 && atomCond(tokens(last,p));
-	stack1 = constCond(true);
+	return stack0 || stack1 && atomCond(tokens(last, cond.end()));
 }
 
 
