@@ -344,12 +344,19 @@ int Table::select(const tokens& attrName, const tokens& whereClause)
 			index.push_back(attrIndex[x]);
 	int entriesAffected = 0;
 	cond_t cond = buildCond(whereClause);
+	auto print = [](data_t* p, char end='\n')
+	{
+		if (p != nullptr)
+			std::cout << *p << end;
+		else
+			std::cout << "NULL" << end;
+	};
 	for (Entry& e: data)
 		if (cond(e))
 		{
 			for (int i = 0; i < attrName.size() - 1; ++i)
-				std::cout << *e[index[i]] << "\t";
-			std::cout << *e[index.back()] << std::endl;
+				print(e[index[i]], '\t');
+			print(e[index.back()]);
 			++entriesAffected;
 		}
 	return entriesAffected;
