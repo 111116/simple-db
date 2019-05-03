@@ -142,12 +142,12 @@ cond_t Table::buildCond(const tokens& cond)
 	auto last = cond.begin();
 	for (auto p = cond.begin(); p != cond.end(); ++p)
 	{
-		if (stringToLower(*p) == "AND")
+		if (stringToLower(*p) == "and")
 		{
 			stack1 &= atomCond(tokens(last,p));
 			last = p;
 		}
-		if (stringToLower(*p) == "OR")
+		if (stringToLower(*p) == "or")
 		{
 			stack0 |= stack1 && atomCond(tokens(last,p));
 			stack1 = constCond(true);
