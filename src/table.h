@@ -52,7 +52,6 @@ public:
 	int update(const tokens& setClause, const tokens& whereClause);
 	int select(const tokens& attrName);
 	int select(const tokens& attrName, const tokens& whereClause);
-	int filter(const tokens& whereClause, Table& result);
 
 	void show(std::ostream& = std::cout);
 };

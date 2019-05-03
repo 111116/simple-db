@@ -379,26 +379,6 @@ int Table::select(const tokens& attrName, const tokens& whereClause)
 
 
 /**
- * Selects entries which satisfy condition ${cond}, and puts the result into ${result} as a new table.
- *
- * @param Select condition
- * @param Table for select result
- * @return Number of entries selected
-*/
-int Table::filter(const tokens& whereClause, Table& result)
-{
-	result.attr = this->attr;
-	result.attrIndex = this->attrIndex;
-	result.primaryAttr = this->primaryAttr;
-	result.data.clear();
-	cond_t cond = buildCond(whereClause);
-	for (Entry& e: data)
-		if (cond(e)) result.data.push_back(e);
-	return result.data.size();
-}
-
-
-/**
  * Lists columns of this table.
  *
  * @param Stream for output
