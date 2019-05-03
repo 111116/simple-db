@@ -187,7 +187,7 @@ set_t Table::atomSet(const tokens& cond)
 	return [=](Entry& e)
 	{
 		delete e[index];
-		e[index] = val.get();
+		e[index] = val->copy();
 	};
 }
 
