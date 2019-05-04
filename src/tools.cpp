@@ -20,6 +20,11 @@ std::vector<std::string> split(std::string raw)
 	};
 	for (int i=0; i<raw.length(); ++i)
 	{
+		// accept "-?[0-9]+(\.[0-9]*)?" as number
+		// accept "[_A-Za-z][_0-9A-Za-z]*" as identifier
+		// accept "\'([^\'\\]|(\'\')|(\\.))*\'" as string
+		// accept "\"([^\"\\]|(\"\")|(\\.))*\"" as string
+		// accept "[-\+\*\/<>=,;\(\)<>=]" as separator
 		if (inString)
 		{
 			if (raw[i] == '\n')
@@ -60,8 +65,9 @@ std::vector<std::string> split(std::string raw)
 			current = raw[i];
 			continue;
 		}
-		// if in [_0-9a-zA-Z], treat as valid char
-		if (isdigit(raw[i]) || isalpha(raw[i]) || raw[i] == '_')
+		// accept "-?[_0-9\.a-zA-Z]*"
+		if (isdigit(raw[i]) || isalpha(raw[i]) || raw[i] == '_' || raw[i] == '.'
+			|| )
 		{
 			current += raw[i];
 			continue;
