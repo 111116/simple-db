@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <regex>
 #include "tools.h"
 
 // split a string
@@ -6,76 +7,14 @@ std::vector<std::string> split(std::string raw)
 {
 	raw.push_back('\n');
 	std::vector<std::string> res;
-	std::string current;
-	bool inString = false;
-	char stringDelimiter; // surrounding delimiter, if inside a string literal
 
-	auto split = [&]()
-	{
-		if (!current.empty())
-		{
-			res.push_back(std::move(current));
-			current = "";
-		}
-	};
-	for (int i=0; i<raw.length(); ++i)
-	{
-		// accept "-?[0-9]+(\.[0-9]*)?" as number
-		// accept "[_A-Za-z][_0-9A-Za-z]*" as identifier
-		// accept "\'([^\'\\]|(\'\')|(\\.))*\'" as string
-		// accept "\"([^\"\\]|(\"\")|(\\.))*\"" as string
-		// accept "[-\+\*\/<>=,;\(\)<>=]" as separator
-		if (inString)
-		{
-			if (raw[i] == '\n')
-				throw "string literal missing terminating character";
-			current += raw[i];
-			if (raw[i] == stringDelimiter)
-			{
-				if (raw[i+1] == stringDelimiter)
-				{
-					current += stringDelimiter;
-					i++;
-				}
-				else // end of a string literal
-				{
-					inString = false;
-				}
-			}
-			if (raw[i] == '\\' && raw[i+1] != '\n')
-			{
-				i++;
-				current += raw[i];
-			}
-			continue;
-		}
-		// outside a string literal
-		// split at whitespace character
-		if (raw[i] == ' ' || raw[i] == '\t' || raw[i] == '\n')
-		{
-			split();
-			continue;
-		}
-		// if string literal starts
-		if (raw[i] == '\'' || raw[i] == '\"')
-		{
-			split();
-			inString = true;
-			stringDelimiter = raw[i];
-			current = raw[i];
-			continue;
-		}
-		// accept "-?[_0-9\.a-zA-Z]*"
-		if (isdigit(raw[i]) || isalpha(raw[i]) || raw[i] == '_' || raw[i] == '.'
-			|| )
-		{
-			current += raw[i];
-			continue;
-		}
-		// other spliting chars
-		split();
-		res.push_back({raw[i]});
-	}
+	// accept "-?[0-9]+(\.[0-9]*)?" as number
+	// accept "[_A-Za-z][_0-9A-Za-z]*" as identifier
+	// accept "\'([^\'\\]|(\'\')|(\\.))*\'" as string
+	// accept "\"([^\"\\]|(\"\")|(\\.))*\"" as string
+	// accept "[-\+\*\/<>=,;\(\)<>=]" as separator
+
+	// TODO
 	return res;
 }
 
