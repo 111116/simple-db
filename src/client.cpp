@@ -6,7 +6,7 @@
 
 void create(std::string dbName)
 {
-	dbList[dbName] = new Database;
+	dbList[dbName] = new Database(dbName);
 }
 
 void drop(std::string dbName)
@@ -111,6 +111,7 @@ int main()
 				if (str[1] == "*")
 					attrName = selected->table[tableName]->attrList();
 				auto t = find(strLower.begin(), strLower.end(), "where") - strLower.begin();
+				selected->table[tableName]->sort();
 				if (t == (int)strLower.size())
 					selected->table[tableName]->select(attrName);
 				else

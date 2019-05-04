@@ -3,6 +3,13 @@
 #include "database.h"
 
 /**
+ * Constructs this new database with its name given.
+ *
+ * @param Name of this new database
+*/
+Database::Database(std::string dbName): dbName(dbName) {}
+
+/**
  * Destructs this database.
 */
 Database::~Database()
@@ -13,7 +20,7 @@ Database::~Database()
 
 /**
  * Creates a table in this database.
- * 
+ *
  * @param Name of the table to be created
  * @param Columns with data types and constraints
 */
@@ -24,7 +31,7 @@ void Database::create(std::string tableName, const tokens& traits)
 
 /**
  * Drops a table named ${tableName} from this database.
- * 
+ *
  * @param Name of the table to be dropped
 */
 void Database::drop(std::string tableName)
@@ -34,14 +41,17 @@ void Database::drop(std::string tableName)
 
 void Database::show()
 {
-	std::cout << "Table" << std::endl;
-	for (auto p: table)
-		std::cout << p.first << std::endl;
+	if (table.size() > 0)
+	{
+		std::cout << "Tables_in_" << dbName << std::endl;
+		for (auto p: table)
+			std::cout << p.first << std::endl;
+	}
 }
 
 /**
  * Lists columns of a table specified in this database.
- * 
+ *
  * @param Name of the table
 */
 void Database::show(std::string tableName)
@@ -51,7 +61,7 @@ void Database::show(std::string tableName)
 
 /**
  * Finds a table in this database
- * 
+ *
  * @param Name of the table
  * @return Pointer to specified table (NULL if not found)
 */

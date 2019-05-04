@@ -382,3 +382,19 @@ void Table::show(std::ostream& o)
 			<< (i == primaryAttr ? "PRI" : "") << "\tNULL" << "\t\n";
 	}
 }
+
+/**
+ * Physically sort entries with the column name specified.
+ *
+ * @param Name of the key. If empty the primary key will take place.
+*/
+void Table::sort(std::string attr)
+{
+	if (attr == "")
+	{
+		if (primaryAttr == -1) return;
+		else attr = this->attr[primaryAttr].name;
+	}
+	int index = attrIndex[attr];
+	std::sort(data.begin(), data.end(), [=](Entry& a, Entry& b) { return *a[index] < *b[index]; });
+}

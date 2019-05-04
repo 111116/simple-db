@@ -50,4 +50,5 @@ public:
 	int select(const tokens& attrName, const tokens& whereClause);
 
 	void show(std::ostream& = std::cout);
+	void sort(std::string = "");
 };
