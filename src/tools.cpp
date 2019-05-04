@@ -60,8 +60,9 @@ std::vector<std::string> split(std::string raw)
 			current = raw[i];
 			continue;
 		}
-		// if in [_0-9a-zA-Z], treat as valid char
-		if (isdigit(raw[i]) || isalpha(raw[i]) || raw[i] == '_')
+		// accept "[-_0-9A-Za-z\.]+"
+		if (isdigit(raw[i]) || isalpha(raw[i]) || raw[i] == '_' ||
+			raw[i] == '-' || raw[i] == '.')
 		{
 			current += raw[i];
 			continue;
