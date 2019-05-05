@@ -96,113 +96,59 @@ Entry Entry::copy();
 ************
 
 ## `Table` (table.h/cpp)
-定义一张数据表。存储表中每列的类型、属性，以及每行的数据内容。
+
+数据表，存储表中每列的类型、属性，以及每行的数据内容。
 
 ```c++
-private: enum Table::type_t
+public: Table::Table(const tokens& attrClause)
 ```
 
-用于标识列的数据类型。
-
-```c++
-private: struct Table::attr_t
-```
-
-用于保存一列的属性。包括：显示宽度（预留属性，目前在库中为注释状态）、列名称（`std::string` 类型）、非空约束（`NOT NULL` 约束，`bool` 类型）。`Table::attr_t::typeName()` 成员函数返回该列的类型的字符串表示，可用于 `SHOW COLUMNS FROM table` 输出。
-
-```c++
-private: std::vector<attr_t> Table::attr
-```
-
-保存每列的数据类型及属性。
-
-```c++
-private: std::unordered_map<std::string, unsigned> Table::attrIndex
-```
-
-保存列名到在 `Table::attr` 中的顺序编号的映射。
-
-```c++
-private: std::vector<Entry> Table::data
-```
-
-保存数据表中每一行的数据。
-
-```c++
-private: int Table::primaryAttr
-```
-
-保存主键（`PRIMARY KEY`）所在的列的编号。若为 -1， 表示表中不含主键。
-
-```c++
-private: cond_t Table::atomCond(const tokens&)
-```
-
-构造原子判断条件（不能拆分的最小判断条件），返回 `cond_t` 对象。
-
-关于 `tokens` 的详细用法见后。
-
-```c++
-private: cond_t Table::buildCond(const tokens&)
-```
-
-构造完整判断条件，返回 `cond_t` 对象。`Table::buildCond()` 内部通过 `Table::atomCond()` 先构造若干原子条件，再通过逻辑运算复合成完整的条件。
-
-```c++
-private: set_t Table::atomSet(const tokens&)
-```
-
-构造原子修改操作（单个修改操作），返回 `set_t` 对象。
-
-```c++
-private: set_t Table::buildSet(const tokens&)
-```
-
-构造完整修改操作。
-
-注意：当前库**不支持**多重修改操作，若需要支持该功能需先修改 `Table::buildSet()`。当前版本的 `Table::buildSet()` 行为与 `Table::atomSet()` 一致。
-
-```c++
-private: Entry Table::buildEntry(const tokens&, const tokens&)
-```
-
-第一个参数为列名，第二个为对应的 MySQL 字面值。根据这些列名和字面值，及表中各列的数据类型及属性，构造表中的一行数据。
-
-```c++
-public: Table::Table(const tokens&)
-```
-
-根据参数内容构造具有相应结构的空表。
+根据参数内容构造具有相应结构的空表。`attrClause`形如`split("stu_id INT NOT NULL, stu_name CHAR, PRIMARY
+KEY(stu_id)")`。
 
 ```c++
 public: attrs Table::attrList()
 ```
 
-返回表中各列名称。关于 `attrs` 的详情参见后文。
+返回表中各列名称，返回值形如`{"attrName1","attrName2"}`。
+
+
 
 ```c++
-public: int Table::insert(const tokens&, const tokens&)
+public: int Table::insert(const tokens& attrNames, const tokens& attrValues)
 ```
 
-参数与 `Table::buildEntry()` 一致。向表中插入一行数据。返回插入的行数。
+向表中插入一行数据。返回插入的行数（即1）。
+
+`attrNames`形如`split("attrName1, attrName2")`（也即`{"attrName1", ",", "attrName2"}`）。
+
+`attrValues`形如`split("3.14, 'w'")`。
 
 注意：目前该函数不会判断插入的数据是否违反了约束（`NOT NULL`, `PRIMARY KEY`）。
 
+
+
 ```c++
-public: int Table::remove([const tokens&])
+public: int Table::remove([const tokens& whereClause])
 ```
 
 删除表中数据。参数指定删除条件。若省略该参数，删除表中全部数据，但保留表的结构。返回删除的行数。
 
+`whereClause` 形如 `split("id=10492 or name='q'")`，下同。
+
 ```c++
-public: int Table::update(const tokens& [, const tokens&])
+public: int Table::update(const tokens& setClause [, const tokens& whereClause])
 ```
+
+`setClause` 形如 `split("stu_name='b'")`
 
 修改表中数据。第一个参数指定修改方法，第二个指定修改条件。若省略第二个参数，则对所有记录进行修改。返回修改的行数。
 
 ```c++
-public: int Table::select(const attrs& [, const tokens&])
+public: int Table::select(const attrs& attrName [, const tokens& whereClause])
 ```
+
+`attrName` 形如 `{"name","id"}`。
 
 查询表中数据并输出。第一个参数指定要输出的列，第二个指定查询条件。若省略第二个参数，输出表中全部数据。返回被输出的行数。
 
@@ -213,7 +159,7 @@ public: void Table::show()
 输出表的结构，格式与 `SHOW COLUMNS FROM table` 相同。
 
 ```c++
-public: void Table::sort(std::string)
+public: void Table::sort(std::string attrName)
 ```
 
 对表中数据进行排序。参数指定根据哪一列进行排序。若省略该参数，则按主键排序。若省略该参数且表无主键，则什么都不做。
@@ -236,7 +182,7 @@ public: std::map<std::string, Table*> Database::table
 保存表名到指向表的指针的映射。
 
 ```c++
-public: Database::Database(std::string)
+public: Database::Database(std::string dbName)
 ```
 
 构造空数据库。参数指定表的名称。
@@ -248,13 +194,13 @@ public: Database::~Database()
 析构函数。析构对象时，一并删除保存的所有表并释放内存。
 
 ```c++
-public: void Database::drop(std::string)
+public: void Database::drop(std::string tableName)
 ```
 
 删除一张表。参数指定要删的表的名称。
 
 ```c++
-public: void Database::create(std::string, const tokens&)
+public: void Database::create(std::string tableName, const tokens& traits)
 ```
 
 创建新表。第一个参数指定表的名称。第二个参数指定表的各列属性。
@@ -266,7 +212,7 @@ public: void show()
 输出数据库中包含的各表。
 
 ```c++
-public: void show(std::string)
+public: void show(std::string tableName)
 ```
 
 输出指定表的结构，格式与 `SHOW COLUMNS FROM table` 相同。
@@ -316,19 +262,19 @@ std::string stringToLower(std::string)
 本文件 main.cpp 同时也是数据库第一阶段的测试代码。
 
 ```c++
-void drop(std::string)
+void drop(std::string dbName)
 ```
 
 根据指定的名称删除一个数据库。
 
 ```c++
-void create(std::string)
+void create(std::string dbName)
 ```
 
 创建指定名称的数据库。
 
 ```c++
-void use(std::string)
+void use(std::string dbName)
 ```
 
 选中指定名称的数据库。
