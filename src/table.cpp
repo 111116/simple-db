@@ -394,7 +394,7 @@ void Table::sort(std::string attrName)
 	if (attrName == "")
 	{
 		if (primaryAttr == -1) return;
-		else attrName = this->attrName[primaryAttr].name;
+		else attrName = this->attr[primaryAttr].name;
 	}
 	int index = attrIndex[attrName];
 	std::sort(data.begin(), data.end(), [=](Entry& a, Entry& b) { return *a[index] < *b[index]; });
