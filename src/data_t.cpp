@@ -12,6 +12,7 @@ dataDouble::dataDouble(std::string value): value(std::stod(value)) {}
 dataString::dataString(const dataString& o): value(o.value) {}
 
 // 根据单个 MySQL 字面值构造 dataString 对象
+// TODO 注意！当前不能通过 C++ std::string 变量的值（而非 MySQL 字符串字面值）直接构造 dataString 对象
 dataString::dataString(std::string str)
 {
 	value = "";

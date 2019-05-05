@@ -49,14 +49,9 @@ Table::Table(const tokens& attrClause) // 构造新表，参数通过 split() �
 		primaryAttr = attrIndex[primaryKey];
 }
 
-/**
- * Makes a boolean entry filter function with the string specified.
- *
- * @param Condition (single operation)
- * @return Boolean filter function based on this condition string.
- * @exception nullptr / "unrecognized condition" / exceptions in fromLiteral
-*/
-cond_t Table::atomCond(const tokens& cond) // 根据 where 子句构造原子判断条件函数
+// 根据 WHERE 子句构造原子判断条件函数
+// 注意此处只能包含单个比较运算
+cond_t Table::atomCond(const tokens& cond)
 {
 	// TODO 当前尚不支持自动连接连续书写的多个字符串："abc" "def" => "abcdef"
 	if (cond.size() != 3)
@@ -113,14 +108,7 @@ cond_t Table::atomCond(const tokens& cond) // 根据 where 子句构造原子判
 	return constCond(op(*val1, *val2));
 }
 
-
-
-/**
- * Makes a boolean entry filter function with the string specified.
- *
- * @param Condition
- * @return Boolean filter function based on this condition string.
-*/
+// 根据 token 列表构造完整的 WHERE 子句判断函数对象
 cond_t Table::buildCond(const tokens& cond)
 {
 	cond_t stack0 = constCond(false);
@@ -143,22 +131,20 @@ cond_t Table::buildCond(const tokens& cond)
 	return stack0 || stack1 && atomCond(tokens(last, cond.end()));
 }
 
-
-/**
- * Makes a entry modifier (one-value assignment) with the string specified.
-*/
+// 构造原子修改操作函数对象
+// 参数 cond 中只能包含一条修改操作
 set_t Table::atomSet(const tokens& cond)
 {
 	if (cond.size() != 3 || cond[1] != "=")
-		throw "unrecognized set";
+		throw "Unrecognized set";
 	const std::string& attrName = cond[0];
 	const std::string& attExpression = cond[2];
 
 	if (!attrIndex.count(attrName))
-		throw "no such attr";
+		throw "No such attribute";
 	int index = attrIndex[attrName];
 	std::shared_ptr<data_t> val (data_t::fromLiteral(attExpression));
-	// TODO change fromLiteral to evaluate
+	// TODO 以后可能需要将单个的 fromLiteral 读取字面值修改为赋值表达式的计算
 	return [=](Entry& e)
 	{
 		delete e[index];
@@ -166,36 +152,24 @@ set_t Table::atomSet(const tokens& cond)
 	};
 }
 
-
-
-/**
- * Makes a entry modifier function with the string specified.
- *
- * @param Operation
- * @return modifier function based on this operation string.
-*/
+// 构造复合修改操作函数对象
+// TODO 当前只支持单个修改操作（不支持在一个 SET 子句中修改多个列的值），因此目前该函数行为与 atomSet 等同
 set_t Table::buildSet(const tokens& cond)
 {
-	// currently only handling one-value assignment
 	return atomSet(cond);
 }
 
-
-/**
- * Makes an entry with the string specified.
- * in example: INSERT INTO oop_info(stu_id, stu_name) VALUES (2018011343, "a");
- * attrName = {"stu_id", ",", "stu_name"}
- * dataValue = {"2018011343", ",", "\"a\""}
- *
- * @param attribute list (unparsed)
- * @param data list (unparsed)
- * @return entry constructed.
-*/
+// 根据列名称和相应的字面量构造一行数据
+// attrNames 中未涉及的列将被设置为 NULL (nullptr)
+//
+// 示例：INSERT INTO oop_info(stu_id, stu_name) VALUES (2018011343, "a");
+// attrName = {"stu_id", ",", "stu_name"}
+// dataValue = {"2018011343", ",", "\"a\""}
 Entry Table::buildEntry(const tokens& attrNames, const tokens& attrValues)
 {
 	int n = attrNames.size();
 	if ((n!=0 && n%2==0) || n!=attrValues.size())
-		throw "Table::buildEntry: unrecognized format";
+		throw "Table::buildEntry: Unrecognized format";
 	// attrNames & attrValues should contain alternating string & comma
 	Entry entry(attr.size(), nullptr);
 	for (int i=0; i<n; ++i)
@@ -207,31 +181,22 @@ Entry Table::buildEntry(const tokens& attrNames, const tokens& attrValues)
 		else
 		{
 			if (attrNames[i] != "," || attrValues[i] != ",")
-				throw "Table::buildEntry: unrecognized format";
+				throw "Table::buildEntry: Unrecognized format";
 		}
 	}
 	return entry;
 }
 
-
-/**
- * Inserts an entry to this table.
- *
- * @param list of attribute names
- * @param list of attribute values
- * @return Number of entries inserted
-*/
+// 向表中插入一行，参数格式与 Table::buildEntry 相同
+// 返回插入的行数（总是 1）
 int Table::insert(const tokens& attrNames, const tokens& attrValues)
 {
 	data.push_back(buildEntry(attrNames, attrValues));
 	return 1;
 }
 
-/**
- * Clears all entries in this table, but preserving table structure.
- *
- * @return Number of entries deleted
-*/
+// 清空表中数据，但保留表的结构
+// 返回删除的行数
 int Table::remove()
 {
 	int entriesRemoved = std::distance(data.begin(), data.end());
@@ -239,12 +204,8 @@ int Table::remove()
 	return entriesRemoved;
 }
 
-/**
- * Deletes entries which satisfy condition ${cond} from this table.
- *
- * @param Delete condition
- * @return Number of entries deleted
-*/
+// 删除表中满足 whereClause 指定的条件的数据
+// 返回删除的行数
 int Table::remove(const tokens& whereClause)
 {
 	cond_t cond = buildCond(whereClause);
@@ -254,15 +215,8 @@ int Table::remove(const tokens& whereClause)
 	return entriesRemoved;
 }
 
-
-
-
-/**
- * Updates all entries with ${setClause}.
- *
- * @param Update method (as a function)
- * @return Number of entries updated
-*/
+// 通过 setClause 修改表中每一行的数据
+// 返回被修改的行数
 int Table::update(const tokens& setClause)
 {
 	set_t set = buildSet(setClause);
@@ -271,14 +225,8 @@ int Table::update(const tokens& setClause)
 	return data.size();
 }
 
-
-/**
- * Updates entries which satisfy condition ${cond} with data ${set}.
- *
- * @param Update method (as a function)
- * @param Update condition
- * @return Number of entries updated
-*/
+// 通过 setClause 修改表中所有满足 whereClause 的行的数据
+// 返回被修改的行数
 int Table::update(const tokens& setClause, const tokens& whereClause)
 {
 	set_t set = buildSet(setClause);
@@ -289,29 +237,15 @@ int Table::update(const tokens& setClause, const tokens& whereClause)
 	return entriesAffected;
 }
 
-
-
-/**
- * print specified column (data field)
- * pass {"*"} as first argument to print all columns
- *
- * @param column specified
- * @return Number of entries printed
-*/
+// 对于表中的每一行输出 attrName 指定的列的数据
+// 返回被输出的行数
 int Table::select(const attrs& attrName)
 {
 	return select(attrName, split("1=1"));
 }
 
-
-/**
- * print specified column (data field) of entries that satisfy a condition
- * pass {"*"} as first argument to print all columns
- *
- * @param column specified
- * @param condition
- * @return Number of entries printed
-*/
+// 对于表中满足 whereClause 的每一行输出 attrName 指定的列的数据
+// 返回被输出的行数
 int Table::select(const attrs& attrName, const tokens& whereClause)
 {
 	std::vector<int> index;
@@ -346,6 +280,7 @@ int Table::select(const attrs& attrName, const tokens& whereClause)
 	return entriesAffected;
 }
 
+// 汇总表中所有列的名称并返回
 attrs Table::attrList() const
 {
 	attrs res;
@@ -354,11 +289,7 @@ attrs Table::attrList() const
 	return res;
 }
 
-/**
- * Lists columns of this table.
- *
- * @param Stream for output
-*/
+// 打印表的结构
 void Table::show()
 {
 	std::cout << "Field\tType\tNull\tKey\tDefault\tExtra\n";
@@ -370,11 +301,8 @@ void Table::show()
 	}
 }
 
-/**
- * Physically sort entries with the column name specified.
- *
- * @param Name of the key. If empty the primary key will take place.
-*/
+// 对表中所有数据排序，会直接修改数据存储的顺序
+// 参数 attrName 指定要根据哪一列进行排序，如果留空则尝试按主键排序，如果同时表没有主键则什么都不做
 void Table::sort(std::string attrName)
 {
 	if (attrName == "")
