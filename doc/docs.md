@@ -55,11 +55,6 @@ public: virtual bool dataX::operator < (const data_t&)
 2. 为方便起见，我们提供了大于号 (>) 及等号 (==) 运算符的默认重载（位于 `data_t::operator >` 或 `data_t::operator ==` 中，会通过小于运算符的结果进行大于、等于的比较）。
 3. 由于 C++ 语法的一些限制，很难使得二元比较运算符的两边同时多态。为了便于扩展，我们在 data_t.cpp 文件中，提供了 `compareHelper` 宏。该宏判断待比较的 `data_t` 参数的类型，并在类型正确时返回相应的比较结果；接收两个参数，第一个参数表示要判断的 `data_t` 派生类型，第二个参数表示对 `value` 成员变量的转换规则（便于大小写不敏感的字符串比较等场合；不需要转换规则时可省略该参数）。若出现了没有意义的比较，将抛出异常。具体请参见 data_t.cpp 中三种派生类型的比较运算符写法。
 
-```c++
-public: virtual data_t::~data_t()
-```
-
-析构函数。释放对象。
 
 ************
 
@@ -85,7 +80,12 @@ cond_t constCond(bool);
 ************
 
 ## `Entry` (entry.h/cpp)
-定义了数据表中的一行。继承自 `std::vector<data_t*>`，可使用 `std::vector` 的大部分特性。重写了移动构造、移动赋值函数，不允许复制构造。
+
+```c++
+class Entry: public std::vector<data_t*>
+```
+
+定义了数据表中的一行，大部分用法同 `vector` 。只能移动构造、移动赋值，为避免误操作，禁止复制构造、复制赋值。复制请使用 `Entry::copy()` 。
 
 ```c++
 Entry Entry::copy();
@@ -103,14 +103,14 @@ Entry Entry::copy();
 public: Table::Table(const tokens& attrClause)
 ```
 
-根据参数内容构造具有相应结构的空表。`attrClause`形如`split("stu_id INT NOT NULL, stu_name CHAR, PRIMARY
-KEY(stu_id)")`。
+根据参数内容构造具有相应结构的空表。`attrClause` 形如 `split("stu_id INT NOT NULL, stu_name CHAR, PRIMARY
+KEY(stu_id)")` 。
 
 ```c++
 public: attrs Table::attrList()
 ```
 
-返回表中各列名称，返回值形如`{"attrName1","attrName2"}`。
+返回表中各列名称，返回值形如 `{"attrName1","attrName2"}` 。
 
 
 
@@ -120,9 +120,9 @@ public: int Table::insert(const tokens& attrNames, const tokens& attrValues)
 
 向表中插入一行数据。返回插入的行数（即1）。
 
-`attrNames`形如`split("attrName1, attrName2")`（也即`{"attrName1", ",", "attrName2"}`）。
+`attrNames` 形如 `split("attrName1, attrName2")`（也即 `{"attrName1", ",", "attrName2"}` ）。
 
-`attrValues`形如`split("3.14, 'w'")`。
+`attrValues` 形如 `split("3.14, 'w'")`。
 
 注意：目前该函数不会判断插入的数据是否违反了约束（`NOT NULL`, `PRIMARY KEY`）。
 
@@ -188,12 +188,6 @@ public: Database::Database(std::string dbName)
 构造空数据库。参数指定表的名称。
 
 ```c++
-public: Database::~Database()
-```
-
-析构函数。析构对象时，一并删除保存的所有表并释放内存。
-
-```c++
 public: void Database::drop(std::string tableName)
 ```
 
@@ -257,6 +251,7 @@ std::string stringToLower(std::string)
 ************
 
 ## Client (main.cpp)
+
 主程序，实现了完整的关系型数据库管理系统（RDBMS）。
 
 本文件 main.cpp 同时也是数据库第一阶段的测试代码。
