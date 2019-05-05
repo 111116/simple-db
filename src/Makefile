@@ -4,13 +4,10 @@ CPPFLAGS = -std=c++14 -O2
 .PHONY: all
 all: main
 
-main: main.o client.o cond_t.o data_t.o database.o entry.o table.o tools.o
+main: main.o cond_t.o data_t.o database.o entry.o table.o tools.o
 	$(CC) $^ -o $@
 
-main.o: main.cpp client.h database.h table.h entry.h data_t.h cond_t.h set_t.h tools.h
-	$(CC) $(CPPFLAGS) $< -o $@ -c
-
-client.o: client.cpp client.h database.h table.h entry.h data_t.h cond_t.h set_t.h tools.h
+main.o: main.cpp database.h table.h entry.h data_t.h cond_t.h set_t.h tools.h
 	$(CC) $(CPPFLAGS) $< -o $@ -c
 
 cond_t.o: cond_t.cpp cond_t.h entry.h data_t.h

@@ -40,6 +40,8 @@
 ### `public: virtual data_t::~data_t()`
 析构函数。释放对象。
 
+************
+
 ## `cond_t` (cond_t.h/cpp)
 函数（`std::function<bool(const Entry&)>`）对象，定义了判断一个 `Entry`（见后）是否符合一定条件的规则，应用于 `WHERE` 子句中。
 
@@ -51,14 +53,20 @@
 ### 注释
 `cond_t` 对象可通过相应参数和返回值类型的 Lambda 表达式赋值，也可直接通过 `std::function` 内置重载的 `()` 运算符运行保存的函数并求值。详细用法见后。
 
+************
+
 ## `set_t` (set_t.h)
 函数（`std::function<void(Entry&>)`）对象，定义了修改一条 `Entry`（见后）的方法，应用于 `SET` 子句中。也可通过 Lambda 表达式赋值、通过 `()` 运算符执行。详细用法见后。
+
+************
 
 ## `Entry` (entry.h/cpp)
 定义了数据表中的一行。继承自 `std::vector<data_t*>`，可使用 `std::vector` 的大部分特性。重写了移动构造、移动赋值函数，不允许复制构造。
 
 ### `Entry Entry::copy();`
 将当前行复制，返回复制的新行。
+
+************
 
 ## `Table` (table.h/cpp)
 定义一张数据表。存储表中每列的类型、属性，以及每行的数据内容。
@@ -126,6 +134,8 @@
 ### `public: void Table::sort(std::string)`
 对表中数据进行排序。参数指定根据哪一列进行排序。若省略该参数，则按主键排序。若省略该参数且表无主键，则什么都不做。
 
+************
+
 ## `Database` (database.h/cpp)
 定义了数据库对象。包含数据库名称及其各表。
 
@@ -156,26 +166,7 @@
 ### `public: Table* Database::operator [] (std::string)`
 根据名称返回相应表的指针。实质上直接访问了 `Database::table` 映射，是 `Database::table.operator[] (std::string)` 的简化写法。
 
-## Client (client.h/cpp)
-关系型数据库管理系统（RDBMS）。不是一个类，而是一些对象和函数打包。
-
-### `void drop(std::string)`
-根据指定的名称删除一个数据库。
-
-### `void create(std::string)`
-创建指定名称的数据库。
-
-### `void use(std::string)`
-选中指定名称的数据库。
-
-### `void show()`
-输出所有数据库的名称。
-
-### `std::map<std::string, Database*> dbList` (client.cpp)
-保存数据库名到指向数据库的指针的映射。
-
-### `Database* selected` (client.cpp)
-指向当前通过 `USE` 语句选中的数据库。
+************
 
 ## Tools (tools.h/cpp)
 提供其它模块中用到的辅助工具。
@@ -194,7 +185,30 @@
 ### `std::string stringToLower(std::string)`
 将参数中的大写字母全部转换为小写字母。
 
-## main.cpp
-主程序。通过以上各个文件中提供的功能，解析 MySQL 命令并执行对应操作。
+************
 
-main.cpp 为数据库第一阶段的测试代码。
+## Client (main.cpp)
+主程序，实现了完整的关系型数据库管理系统（RDBMS）。
+
+本文件 main.cpp 同时也是数据库第一阶段的测试代码。
+
+### `void drop(std::string)`
+根据指定的名称删除一个数据库。
+
+### `void create(std::string)`
+创建指定名称的数据库。
+
+### `void use(std::string)`
+选中指定名称的数据库。
+
+### `void show()`
+输出所有数据库的名称。
+
+### `std::map<std::string, Database*> dbList`
+保存数据库名到指向数据库的指针的映射。
+
+### `Database* selected`
+指向当前通过 `USE` 语句选中的数据库。
+
+### `int main()`
+主程序入口。通过以上各个文件中提供的功能，解析 MySQL 命令并执行对应操作。
