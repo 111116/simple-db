@@ -159,9 +159,6 @@
 ## Client (client.h/cpp)
 关系型数据库管理系统（RDBMS）。不是一个类，而是一些对象和函数打包。
 
-### `std::map<std::string, Database*> dbList`
-保存数据库名到指向数据库的指针的映射。
-
 ### `void drop(std::string)`
 根据指定的名称删除一个数据库。
 
@@ -174,7 +171,10 @@
 ### `void show()`
 输出所有数据库的名称。
 
-### `static Database* selected`
+### `std::map<std::string, Database*> dbList` (client.cpp)
+保存数据库名到指向数据库的指针的映射。
+
+### `Database* selected` (client.cpp)
 指向当前通过 `USE` 语句选中的数据库。
 
 ## Tools (tools.h/cpp)
