@@ -312,7 +312,7 @@ int Table::update(const tokens& setClause, const tokens& whereClause)
  * @param column specified
  * @return Number of entries printed
 */
-int Table::select(const tokens& attrName)
+int Table::select(const attrs& attrName)
 {
 	return select(attrName, split("1=1"));
 }
@@ -326,7 +326,7 @@ int Table::select(const tokens& attrName)
  * @param condition
  * @return Number of entries printed
 */
-int Table::select(const tokens& attrName, const tokens& whereClause)
+int Table::select(const attrs& attrName, const tokens& whereClause)
 {
 	std::vector<int> index;
 	for (auto& x: attrName)
@@ -359,9 +359,9 @@ int Table::select(const tokens& attrName, const tokens& whereClause)
 	return entriesAffected;
 }
 
-tokens Table::attrList() const
+attrs Table::attrList() const
 {
-	tokens res;
+	attrs res;
 	for (auto& x: attr)
 		res.push_back(x.name);
 	return res;

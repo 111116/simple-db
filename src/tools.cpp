@@ -1,4 +1,3 @@
-#include <algorithm>
 #include "tools.h"
 
 // split a string

@@ -8,8 +8,7 @@
 #include "data_t.h"
 #include "cond_t.h"
 #include "set_t.h"
-
-typedef std::vector<std::string> tokens;
+#include "tools.h"
 
 class Table
 {
@@ -40,14 +39,14 @@ private:
 public:
 	Table(const tokens& attrClause);
 
-	tokens attrList() const;
+	attrs attrList() const;
 	int insert(const tokens& attrName, const tokens& attrValue);
 	int remove();
 	int remove(const tokens& whereClause);
 	int update(const tokens& setClause);
 	int update(const tokens& setClause, const tokens& whereClause);
-	int select(const tokens& attrName);
-	int select(const tokens& attrName, const tokens& whereClause);
+	int select(const attrs& attrName);
+	int select(const attrs& attrName, const tokens& whereClause);
 
 	void show(std::ostream& = std::cout);
 	void sort(std::string = "");
