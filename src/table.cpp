@@ -205,22 +205,22 @@ set_t Table::buildSet(const tokens& cond)
  * @param data list (unparsed)
  * @return entry constructed.
 */
-Entry Table::buildEntry(const tokens& attrName, const tokens& dataValue)
+Entry Table::buildEntry(const tokens& attrNames, const tokens& attrValues)
 {
-	int n = attrName.size();
-	if ((n!=0 && n%2==0) || n!=dataValue.size())
+	int n = attrNames.size();
+	if ((n!=0 && n%2==0) || n!=attrValues.size())
 		throw "Table::buildEntry: unrecognized format";
-	// attrName & dataValue should contain alternating string & comma
+	// attrNames & attrValues should contain alternating string & comma
 	Entry entry(attr.size(), nullptr);
 	for (int i=0; i<n; ++i)
 	{
 		if (i%2 == 0)
 		{
-			entry[attrIndex[attrName[i]]] = data_t::fromLiteral(dataValue[i]);
+			entry[attrIndex[attrNames[i]]] = data_t::fromLiteral(attrValues[i]);
 		}
 		else
 		{
-			if (attrName[i] != "," || dataValue[i] != ",")
+			if (attrNames[i] != "," || attrValues[i] != ",")
 				throw "Table::buildEntry: unrecognized format";
 		}
 	}
@@ -235,9 +235,9 @@ Entry Table::buildEntry(const tokens& attrName, const tokens& dataValue)
  * @param list of attribute values
  * @return Number of entries inserted
 */
-int Table::insert(const tokens& attrName, const tokens& attrValue)
+int Table::insert(const tokens& attrNames, const tokens& attrValues)
 {
-	data.push_back(buildEntry(attrName, attrValue));
+	data.push_back(buildEntry(attrNames, attrValues));
 	return 1;
 }
 

@@ -34,13 +34,13 @@ private:
 	set_t atomSet(const tokens&); // 构造单赋值符的修改器，目前仅支持赋为字面值，见set_t
 	cond_t buildCond(const tokens&); // 构造判断条件
 	set_t buildSet(const tokens&); // 构造修改器（目前仅支持单赋值符，行为同atomSet）
-	Entry buildEntry(const tokens& attrName, const tokens& dataValue); // 构造一行数据，参数格式见实现处注释
+	Entry buildEntry(const tokens& attrNames, const tokens& attrValues); // 构造一行数据，参数格式见实现处注释
 
 public:
 	Table(const tokens& attrClause);
 
 	attrs attrList() const;
-	int insert(const tokens& attrName, const tokens& attrValue);
+	int insert(const tokens& attrNames, const tokens& attrValues);
 	int remove(); // 清空数据，保留各列属性
 	int remove(const tokens& whereClause);
 	int update(const tokens& setClause); // 目前仅支持将单个列赋为字面值
