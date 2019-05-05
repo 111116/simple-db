@@ -343,6 +343,7 @@ int Table::select(const attrs& attrName, const tokens& whereClause)
 		else
 			std::cout << "NULL" << end;
 	};
+	this->sort();
 	for (Entry& e: data)
 		if (cond(e))
 		{
