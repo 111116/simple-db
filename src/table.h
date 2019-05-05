@@ -19,7 +19,7 @@ private:
 	};
 	struct attr_t // 列属性
 	{
-		//int width;
+		//int width; // 数据的显示宽度，该属性为预留接口，当前暂不使用
 		type_t type; // 列数据类型
 		std::string name; // 列名称
 		bool nonNull; // 是否要求非空
@@ -48,6 +48,6 @@ public:
 	int select(const attrs& attrName);
 	int select(const attrs& attrName, const tokens& whereClause);
 
-	void show(std::ostream& = std::cout);
+	void show();
 	void sort(std::string attrName = "");
 };

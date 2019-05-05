@@ -1,13 +1,18 @@
 #include "tools.h"
 
-// split a string
+/**
+ * Splits a raw MySQL statement into tokens.
+ *
+ * @param raw Raw MySQL statement.
+ * @return A vector containing its tokens.
+*/
 std::vector<std::string> split(std::string raw)
 {
 	raw.push_back('\n');
 	std::vector<std::string> res;
 	std::string current;
 	bool inString = false;
-	char stringDelimiter; // surrounding delimiter, if inside a string literal
+	char stringDelimiter; // surrounding delimiter, if inside a string literal: single/double quotation mark
 
 	auto split = [&]()
 	{
@@ -76,8 +81,8 @@ std::vector<std::string> split(std::string raw)
 /**
  * Converts a string to lowercase.
  *
- * @param String to convert
- * @return Lowercase string
+ * @param str String to convert
+ * @return Converted lowercase string
 */
 std::string stringToLower(std::string str)
 {

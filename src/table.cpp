@@ -5,39 +5,26 @@
 #include "table.h"
 #include "tools.h"
 
-/**
- * Returns attributes (data type, width, etc.) of this column in a string.
-*/
-std::string Table::attr_t::typeName() const
+std::string Table::attr_t::typeName() const // 返回列数据类型的名称
 {
 	switch (type)
 	{
 		case type_t::INTEGER:
 		{
-			//return "int(" + std::to_string(width) + ")";
 			return "int(11)";
 		}
 		case type_t::DOUBLE:
 		{
-			//return "double(" + std::to_string(width) + ")";
 			return "double";
 		}
 		case type_t::STRING:
 		{
-			//return "char(" + std::to_string(width) + ")";
 			return "char(1)";
 		}
 	}
 }
 
-
-/**
- * Table constructor
- * attrlist format: (attrName1 Type1, ..., attrNameN TypeN NOT NULL, PRIMARY KEY(attrName1))
- *
- * @param attrlist
-*/
-Table::Table(const tokens& attrClause)
+Table::Table(const tokens& attrClause) // 构造新表，参数通过 split() 函数对 SQL 语句中表的属性分词得到
 {
 	std::string primaryKey;
 	for (auto t = attrClause.begin(); t < attrClause.end(); )
@@ -52,7 +39,7 @@ Table::Table(const tokens& attrClause)
 			if (typeLower == "int") type = type_t::INTEGER; else
 			if (typeLower == "double") type = type_t::DOUBLE; else
 			if (typeLower == "char") type = type_t::STRING; else
-				throw "unrecognized data type";
+				throw "Unrecognized data type";
 			attrIndex[*t] = attr.size();
 			attr.push_back((attr_t){type, *t, (p - t) == 4});
 		}
@@ -69,11 +56,11 @@ Table::Table(const tokens& attrClause)
  * @return Boolean filter function based on this condition string.
  * @exception nullptr / "unrecognized condition" / exceptions in fromLiteral
 */
-cond_t Table::atomCond(const tokens& cond)
+cond_t Table::atomCond(const tokens& cond) // 根据 where 子句构造原子判断条件函数
 {
-	// TODO currently not concatenating consecutive strings
+	// TODO 当前尚不支持自动连接连续书写的多个字符串："abc" "def" => "abcdef"
 	if (cond.size() != 3)
-		throw "unrecognized condition";
+		throw "Unrecognized condition";
 	const std::string& operand1 = cond[0];
 	const std::string& operation = cond[1];
 	const std::string& operand2 = cond[2];
@@ -81,7 +68,7 @@ cond_t Table::atomCond(const tokens& cond)
 	int index1 = attrIndex.count(operand1)? attrIndex[operand1]: -1;
 	int index2 = attrIndex.count(operand2)? attrIndex[operand2]: -1;
 
-	// extract operation
+	// 提取比较运算
 	std::function<bool(const data_t&, const data_t&)> op;
 	if (operation == "<")
 		op = std::less<data_t>();
@@ -89,9 +76,9 @@ cond_t Table::atomCond(const tokens& cond)
 		op = std::greater<data_t>();
 	else if (operation == "=")
 		op = [](const data_t& a, const data_t& b){return a==b;};
-	else throw "unrecognized condition";
+	else throw "Unrecognized condition";
 
-	if (index1 != -1 && index2 != -1) // all variables
+	if (index1 != -1 && index2 != -1) // 运算符两边都是变量
 	{
 		return [=](const Entry& e)
 		{
@@ -100,7 +87,7 @@ cond_t Table::atomCond(const tokens& cond)
 			return op(*e[index1], *e[index2]);
 		};
 	}
-	if (index1 != -1 && index2 == -1) // var - literal
+	if (index1 != -1 && index2 == -1) // 左边为变量，右边为字面值
 	{
 		std::shared_ptr<data_t> val2 (data_t::fromLiteral(operand2));
 		return [=](const Entry& e)
@@ -110,7 +97,7 @@ cond_t Table::atomCond(const tokens& cond)
 			return op(*e[index1], *val2);
 		};
 	}
-	if (index1 == -1 && index2 != -1) // literal - var
+	if (index1 == -1 && index2 != -1) // 左边为字面值，右边为变量
 	{
 		std::shared_ptr<data_t> val1 (data_t::fromLiteral(operand1));
 		return [=](const Entry& e)
@@ -120,8 +107,7 @@ cond_t Table::atomCond(const tokens& cond)
 			return op(*val1, *e[index2]);
 		};
 	}
-	// all literals
-	// conversion should throw exception if not literal
+	// 两边都是字面值
 	std::shared_ptr<data_t> val1 (data_t::fromLiteral(operand1));
 	std::shared_ptr<data_t> val2 (data_t::fromLiteral(operand2));
 	return constCond(op(*val1, *val2));
@@ -373,12 +359,12 @@ attrs Table::attrList() const
  *
  * @param Stream for output
 */
-void Table::show(std::ostream& o)
+void Table::show()
 {
-	o << "Field\tType\tNull\tKey\tDefault\tExtra\n";
+	std::cout << "Field\tType\tNull\tKey\tDefault\tExtra\n";
 	for (unsigned i = 0; i < attr.size(); ++i) {
 		const Table::attr_t& a = attr[i];
-		o << a.name << '\t' << a.typeName() << '\t'
+		std::cout << a.name << '\t' << a.typeName() << '\t'
 			<< (a.nonNull ? "NO" : "YES") << '\t'
 			<< (i == primaryAttr ? "PRI" : "") << "\tNULL" << "\t\n";
 	}
@@ -394,7 +380,7 @@ void Table::sort(std::string attrName)
 	if (attrName == "")
 	{
 		if (primaryAttr == -1) return;
-		else attrName = this->attrName[primaryAttr].name;
+		else attrName = this->attr[primaryAttr].name;
 	}
 	int index = attrIndex[attrName];
 	std::sort(data.begin(), data.end(), [=](Entry& a, Entry& b) { return *a[index] < *b[index]; });
