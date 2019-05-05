@@ -193,3 +193,8 @@
 
 ### `std::string stringToLower(std::string)`
 将参数中的大写字母全部转换为小写字母。
+
+## main.cpp
+主程序。通过以上各个文件中提供的功能，解析 MySQL 命令并执行对应操作。
+
+main.cpp 为数据库第一阶段的测试代码。
