@@ -11,7 +11,7 @@ private:
 	std::string dbName;
 public:
 	std::map<std::string, Table*> table;
-	Database(std::string);
+	Database(std::string dbName);
 	~Database();
 	void drop(std::string tableName);
 	void create(std::string tableName, const tokens& traits);

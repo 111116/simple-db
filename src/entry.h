@@ -12,5 +12,6 @@ public:
 	Entry(Entry&& e);
 	~Entry();
 	Entry& operator= (Entry&& e);
+	Entry& operator= (const Entry& e) = delete;
 	Entry copy();
 };
