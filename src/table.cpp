@@ -389,13 +389,13 @@ void Table::show(std::ostream& o)
  *
  * @param Name of the key. If empty the primary key will take place.
 */
-void Table::sort(std::string attr)
+void Table::sort(std::string attrName)
 {
-	if (attr == "")
+	if (attrName == "")
 	{
 		if (primaryAttr == -1) return;
-		else attr = this->attr[primaryAttr].name;
+		else attrName = this->attrName[primaryAttr].name;
 	}
-	int index = attrIndex[attr];
+	int index = attrIndex[attrName];
 	std::sort(data.begin(), data.end(), [=](Entry& a, Entry& b) { return *a[index] < *b[index]; });
 }
