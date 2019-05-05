@@ -95,7 +95,7 @@ Entry Entry::copy();
 
 ************
 
-## `Class Table` (table.h/cpp)
+## `Table` (table.h/cpp)
 
 数据表，存储表中每列的类型、属性，以及每行的数据内容。
 
@@ -103,21 +103,30 @@ Entry Entry::copy();
 public: Table::Table(const tokens& attrClause)
 ```
 
-根据参数内容构造具有相应结构的空表。
+根据参数内容构造具有相应结构的空表。`attrClause`形如`split("stu_id INT NOT NULL, stu_name CHAR, PRIMARY
+KEY(stu_id)")`。
 
 ```c++
 public: attrs Table::attrList()
 ```
 
-返回表中各列名称。关于 `attrs` 的详情参见后文。
+返回表中各列名称，返回值形如`{"attrName1","attrName2"}`。
+
+
 
 ```c++
 public: int Table::insert(const tokens& attrNames, const tokens& attrValues)
 ```
 
-参数与 `Table::buildEntry()` 一致。向表中插入一行数据。返回插入的行数（即1）。
+向表中插入一行数据。返回插入的行数（即1）。
+
+`attrNames`形如`split("attrName1, attrName2")`（也即`{"attrName1", ",", "attrName2"}`）。
+
+`attrValues`形如`split("3.14, 'w'")`。
 
 注意：目前该函数不会判断插入的数据是否违反了约束（`NOT NULL`, `PRIMARY KEY`）。
+
+
 
 ```c++
 public: int Table::remove([const tokens& whereClause])
@@ -125,15 +134,21 @@ public: int Table::remove([const tokens& whereClause])
 
 删除表中数据。参数指定删除条件。若省略该参数，删除表中全部数据，但保留表的结构。返回删除的行数。
 
+`whereClause` 形如 `split("id=10492 or name='q'")`，下同。
+
 ```c++
 public: int Table::update(const tokens& setClause [, const tokens& whereClause])
 ```
+
+`setClause` 形如 `split("stu_name='b'")`
 
 修改表中数据。第一个参数指定修改方法，第二个指定修改条件。若省略第二个参数，则对所有记录进行修改。返回修改的行数。
 
 ```c++
 public: int Table::select(const attrs& attrName [, const tokens& whereClause])
 ```
+
+`attrName` 形如 `{"name","id"}`。
 
 查询表中数据并输出。第一个参数指定要输出的列，第二个指定查询条件。若省略第二个参数，输出表中全部数据。返回被输出的行数。
 
@@ -144,7 +159,7 @@ public: void Table::show()
 输出表的结构，格式与 `SHOW COLUMNS FROM table` 相同。
 
 ```c++
-public: void Table::sort(std::string)
+public: void Table::sort(std::string attrName)
 ```
 
 对表中数据进行排序。参数指定根据哪一列进行排序。若省略该参数，则按主键排序。若省略该参数且表无主键，则什么都不做。
@@ -167,7 +182,7 @@ public: std::map<std::string, Table*> Database::table
 保存表名到指向表的指针的映射。
 
 ```c++
-public: Database::Database(std::string)
+public: Database::Database(std::string dbName)
 ```
 
 构造空数据库。参数指定表的名称。
@@ -179,13 +194,13 @@ public: Database::~Database()
 析构函数。析构对象时，一并删除保存的所有表并释放内存。
 
 ```c++
-public: void Database::drop(std::string)
+public: void Database::drop(std::string tableName)
 ```
 
 删除一张表。参数指定要删的表的名称。
 
 ```c++
-public: void Database::create(std::string, const tokens&)
+public: void Database::create(std::string tableName, const tokens& traits)
 ```
 
 创建新表。第一个参数指定表的名称。第二个参数指定表的各列属性。
@@ -197,7 +212,7 @@ public: void show()
 输出数据库中包含的各表。
 
 ```c++
-public: void show(std::string)
+public: void show(std::string tableName)
 ```
 
 输出指定表的结构，格式与 `SHOW COLUMNS FROM table` 相同。
@@ -247,19 +262,19 @@ std::string stringToLower(std::string)
 本文件 main.cpp 同时也是数据库第一阶段的测试代码。
 
 ```c++
-void drop(std::string)
+void drop(std::string dbName)
 ```
 
 根据指定的名称删除一个数据库。
 
 ```c++
-void create(std::string)
+void create(std::string dbName)
 ```
 
 创建指定名称的数据库。
 
 ```c++
-void use(std::string)
+void use(std::string dbName)
 ```
 
 选中指定名称的数据库。
