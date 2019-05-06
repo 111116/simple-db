@@ -1,22 +1,10 @@
 # simple-db
 
-## 组件
+本仓库为《大作业——简易数据库实现》（见`assignment1.pdf`）第一阶段的代码。
 
-`Client` 解析用户输入，管理全局选定数据库
+代码各组件结构与功能参见文档 `doc/docs.md` (`doc/docs.pdf`) 及代码注释。
 
-`Database` 数据库类
-
-`Table` 表类
-
-`Entry` 记录（行）类
-
-`data_t` 数据类型抽象类，派生出各种数据类型
-
-`cond_t` 接收`Entry`返回`bool`的函数类，用于WHERE筛选
-
-`set_t` 接收`Entry&`的函数类，用于SET子句修改数据
-
-详情请参考文档 `doc/docs.md` (`doc/docs.pdf`) 及代码注释。
+基本的代码格式与命名规范见 `CONTRIBUTING.md`。
 
 ## 编译
 
