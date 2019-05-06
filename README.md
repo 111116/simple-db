@@ -1,31 +1,22 @@
 # simple-db
 
-## 代码格式
+本仓库为《大作业——简易数据库实现》（见`assignment1.pdf`）第一阶段的代码。
 
-- 文件名使用小写
+代码各组件结构与功能参见文档 `doc/docs.md` (`doc/docs.pdf`) 及代码注释。
 
-- 类名格式如 `Database`, `Table`, `Entry`, `cond_t`, `data_t`
+基本的代码格式与命名规范见 `CONTRIBUTING.md`。
 
-- 大括号换行
+## 编译
 
-- 适当写注释
-	- 函数说明类的注释考虑使用 Javadoc 风格
+```bash
+git clone https://github.com/111116/simple-db
+cd simple-db/src && make
+```
 
-- 用exception而不用返回值指示异常
+程序在以下环境下测试通过。
 
-## 类型
+* clang-1000.11.45.5 @ x86_64-apple-darwin18.2.0
+* g++ 7.3.0 @ Ubuntu 18.04 (WSL/Windows 10.0.18362.86)
+* 评测 OJ 环境
 
-`Client` 解析用户输入，管理全局选定数据库
-
-`Database`
-
-`Table`
-
-`Entry`
-
-`data_t` 数据类型抽象类，派生出各种数据类型
-
-`cond_t` 接收`Entry`返回`bool`的函数类，用于WHERE筛选
-
-`set_t` 接收`Entry&`的函数类，用于SET子句修改数据
-
+使用较低版本的 GCC 套件编译可能失败。

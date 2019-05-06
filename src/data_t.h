@@ -3,21 +3,21 @@
 #include <string>
 #include <iostream>
 
-class data_t
+class data_t // 封装数据库支持的基本数据类型
 {
 public:
-	static data_t* fromLiteral(std::string);
-	virtual data_t* copy() = 0;
-	virtual bool operator < (const data_t&) const = 0;
+	static data_t* fromLiteral(std::string); // 根据字面值构造相应的 data_t 派生类对象
+	virtual data_t* copy() = 0; // 复制当前 data_t 的内容到新的对象
+	virtual bool operator < (const data_t&) const = 0; // 大小比较运算符
 	virtual bool operator > (const data_t&) const;
 	virtual bool operator == (const data_t&) const;
-	virtual std::string get() const = 0;
+	virtual std::string get() const = 0; // 获取保存的数据的字符串表示
 	virtual ~data_t();
 };
 
 class dataInt: public data_t
 {
-	friend class dataDouble;
+	friend class dataDouble; // 为支持 dataInt 和 dataDouble 之间的大小比较
 private:
 	int value;
 public:
@@ -32,7 +32,7 @@ public:
 
 class dataDouble: public data_t
 {
-	friend class dataInt;
+	friend class dataInt; // 为支持 dataInt 和 dataDouble 之间的大小比较
 private:
 	double value;
 public:

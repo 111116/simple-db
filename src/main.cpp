@@ -1,14 +1,19 @@
 #include <iostream>
 #include <algorithm>
 
-#include "client.h"
+#include "database.h"
 #include "tools.h"
 
+std::map<std::string, Database*> dbList; // 数据库名称到数据库对象的映射
+Database* selected = nullptr; // 当前通过 USE 语句选中的数据库
+
+// 创建一个名为 dbName 的新数据库
 void create(std::string dbName)
 {
-	dbList[dbName] = new Database;
+	dbList[dbName] = new Database(dbName); // 同时保存到映射中
 }
 
+// 删除名为 dbName 的数据库
 void drop(std::string dbName)
 {
 	if (dbList.count(dbName))
@@ -18,11 +23,14 @@ void drop(std::string dbName)
 	}
 }
 
+// 选中名为 dbName 的数据库
+// TODO 没有处理数据库不存在的情况
 void use(std::string dbName)
 {
 	selected = dbList[dbName];
 }
 
+// 打印当前所有数据库的名称
 void show()
 {
 	std::cout << "Database\n";
@@ -30,6 +38,7 @@ void show()
 		std::cout << t.first << std::endl;
 }
 
+// 测试程序入口
 int main()
 {
 	try
@@ -37,10 +46,10 @@ int main()
 		std::string input;
 		while (getline(std::cin, input))
 		{
-			auto str = split(input), strLower = str;
-			std::transform(strLower.begin(), strLower.end(), strLower.begin(), ::stringToLower);
+			auto str = split(input), strLower = str; // 调用 split 函数分词
+			std::transform(strLower.begin(), strLower.end(), strLower.begin(), ::stringToLower); // 全部小写
 
-			if (str.size() < 2) continue;
+			if (str.size() < 2) continue; // 不是完整语句
 
 			if (strLower[0] == "create" && strLower[1] == "database")
 				create(str[2]);
@@ -125,4 +134,5 @@ int main()
 	{
 		std::cerr << "Exception caught: " << s << std::endl;
 	}
+	return 0;
 }

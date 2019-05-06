@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <title>simple-db</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        <link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        <script src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+    </head>
+    <body>
+        <h1 id="simple-db">simple-db</h1>
+<p>以下介绍了本数据库框架的基本结构及开发接口。在代码源文件中还有进一步的说明。</p>
+<h2 id="datat-datathcpp"><code>data_t</code> (data_t.h/cpp)</h2>
+<p>封装数据库支持的基本数据类型，并存储数据。<code>data_t</code> 本身为抽象类，不能创建对象，全部具体功能由派生出的子类实现。</p>
+<p>目前支持三种 MySQL 基本数据类型：<code>int</code>、<code>double</code>、<code>char</code>，通过相应的派生类 <code>dataInt</code>、<code>dataDouble</code>、<code>dataString</code> 实现。以下，当不区分具体是哪个派生类时，用 <code>dataX</code> 表示一个派生类，用 <code>X</code> 表示对应的 C++ 数据类型。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">private</span>: X dataX::value
+</div></code></pre>
+<p>存储一个 MySQL 数据。在重载比较运算符中被使用，详细说明见后。注意该成员不在基类 <code>data_t</code> 中。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: dataX::dataX()
+</div></code></pre>
+<p>根据参数构造相应类型的 <code>data_t</code> 对象。</p>
+<h4 id="%E5%8F%82%E6%95%B0">参数</h4>
+<p>三种派生类型的构造函数均只接受 1 个参数：</p>
+<ul>
+<li>对于 <code>dataInt</code> 及 <code>dataDouble</code> 类型，可以使用相应类型的 MySQL 字面值（<code>std::string</code> 类型）或 C++ 值（<code>int</code> 或 <code>double</code> 类型）构造；</li>
+<li>对于 <code>dataString</code> 类型，只支持通过 MySQL 字符串字面值构造（<code>std::string</code> 类型，其中包含的 MySQL 特殊字符会被自动转义）。<strong>不支持直接以 C++ <code>std::string</code> 中的内容直接构造 dataString</strong>。</li>
+</ul>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-keyword">static</span> <span class="hljs-keyword">data_t</span>* <span class="hljs-keyword">data_t</span>::fromLiteral(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>)
+</div></code></pre>
+<p>根据 MySQL 字面值（通过参数指定）获取指向相应的 <code>data_t</code> 派生类对象的指针。</p>
+<p><strong>备注</strong>：若要增加新的数据类型支持，可仿照 <code>dataInt</code> 等类创建 <code>data_t</code> 的新派生类，并扩充 <code>data_t::fromLiteral()</code> 函数。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-keyword">virtual</span> dataX* dataX::copy()
+</div></code></pre>
+<p>根据当前对象存储的内容，复制一个新的对象，并返回新对象的指针。</p>
+<p><strong>备注</strong>：该函数为 <code>data_t* data_t::copy() = 0</code> 的重写覆盖。参考<a href="https://en.wikipedia.org/wiki/Covariant_return_type">协变返回类型</a>。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-keyword">virtual</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> dataX::get() <span class="hljs-keyword">const</span>;
+</div></code></pre>
+<p>将对象存储的内容转换为字符串，并返回该字符串。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-keyword">virtual</span> <span class="hljs-keyword">bool</span> dataX::<span class="hljs-keyword">operator</span> &lt; (<span class="hljs-keyword">const</span> <span class="hljs-keyword">data_t</span>&amp;)
+</div></code></pre>
+<p>比较两个 <code>data_t</code> 对象存储内容的大小。</p>
+<h4 id="%E5%A4%87%E6%B3%A8">备注</h4>
+<ol>
+<li>同类型的值都可比较大小；不同类型的值仅当有意义时才可比较大小，否则会抛出异常。</li>
+<li>为方便起见，我们提供了大于号 (&gt;) 及等号 (==) 运算符的默认重载（位于 <code>data_t::operator &gt;</code> 或 <code>data_t::operator ==</code> 中，会通过小于运算符的结果进行大于、等于的比较）。</li>
+<li>由于 C++ 语法的一些限制，很难使得二元比较运算符的两边同时多态。为了便于扩展，我们在 data_t.cpp 文件中，提供了 <code>compareHelper</code> 宏。该宏判断待比较的 <code>data_t</code> 参数的类型，并在类型正确时返回相应的比较结果；接收两个参数，第一个参数表示要判断的 <code>data_t</code> 派生类型，第二个参数表示对 <code>value</code> 成员变量的转换规则（便于大小写不敏感的字符串比较等场合；不需要转换规则时可省略该参数）。若出现了没有意义的比较，将抛出异常。具体请参见 data_t.cpp 中三种派生类型的比较运算符写法。</li>
+</ol>
+<hr>
+<h2 id="condt-condthcpp"><code>cond_t</code> (cond_t.h/cpp)</h2>
+<p>函数（<code>std::function&lt;bool(const Entry&amp;)&gt;</code>）对象，定义了判断一个 <code>Entry</code>（见后）是否符合一定条件的规则，应用于 <code>WHERE</code> 子句中。</p>
+<p><code>cond_t</code> 对象定义了与 (and)、或 (or)、非 (not) 逻辑运算，可将多个简单的 <code>cond_t</code> 函数复合成更复杂的 <code>cond_t</code> 函数。同时也定义了赋值与 <code>&amp;=</code>、赋值或 <code>|=</code> 操作符。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">cond_t</span> constCond(<span class="hljs-keyword">bool</span>);
+</div></code></pre>
+<p>根据布尔值 <code>true</code> 或 <code>false</code>（由参数指定）返回一个总是返回该布尔值的函数。</p>
+<h4 id="%E6%B3%A8%E9%87%8A">注释</h4>
+<p><code>cond_t</code> 对象可通过相应参数和返回值类型的 Lambda 表达式赋值，也可直接通过 <code>std::function</code> 内置重载的 <code>()</code> 运算符运行保存的函数并求值。详细用法见后。</p>
+<hr>
+<h2 id="sett-setth"><code>set_t</code> (set_t.h)</h2>
+<p>函数（<code>std::function&lt;void(Entry&amp;&gt;)</code>）对象，定义了修改一条 <code>Entry</code>（见后）的方法，应用于 <code>SET</code> 子句中。也可通过 Lambda 表达式赋值、通过 <code>()</code> 运算符执行。详细用法见后。</p>
+<hr>
+<h2 id="entry-entryhcpp"><code>Entry</code> (entry.h/cpp)</h2>
+<pre><code class="language-c++"><div><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Entry</span>:</span> <span class="hljs-keyword">public</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-keyword">data_t</span>*&gt;
+</div></code></pre>
+<p>定义了数据表中的一行，大部分用法同 <code>vector</code> 。只能移动构造、移动赋值，为避免误操作，禁止复制构造、复制赋值。复制请使用 <code>Entry::copy()</code> 。</p>
+<pre><code class="language-c++"><div>Entry Entry::copy();
+</div></code></pre>
+<p>将当前行复制，返回复制的新行。</p>
+<hr>
+<h2 id="table-tablehcpp"><code>Table</code> (table.h/cpp)</h2>
+<p>数据表，存储表中每列的类型、属性，以及每行的数据内容。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: Table::Table(<span class="hljs-keyword">const</span> tokens&amp; attrClause)
+</div></code></pre>
+<p>根据参数内容构造具有相应结构的空表。<code>attrClause</code> 形如 <code>split(&quot;stu_id INT NOT NULL, stu_name CHAR, PRIMARY KEY(stu_id)&quot;)</code> 。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: attrs Table::attrList()
+</div></code></pre>
+<p>返回表中各列名称，返回值形如 <code>{&quot;attrName1&quot;,&quot;attrName2&quot;}</code> 。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-keyword">int</span> Table::insert(<span class="hljs-keyword">const</span> tokens&amp; attrNames, <span class="hljs-keyword">const</span> tokens&amp; attrValues)
+</div></code></pre>
+<p>向表中插入一行数据。返回插入的行数（即1）。</p>
+<p><code>attrNames</code> 形如 <code>split(&quot;attrName1, attrName2&quot;)</code>（也即 <code>{&quot;attrName1&quot;, &quot;,&quot;, &quot;attrName2&quot;}</code> ）。</p>
+<p><code>attrValues</code> 形如 <code>split(&quot;3.14, 'w'&quot;)</code>。</p>
+<p>注意：目前该函数不会判断插入的数据是否违反了约束（<code>NOT NULL</code>, <code>PRIMARY KEY</code>）。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-keyword">int</span> Table::remove([<span class="hljs-keyword">const</span> tokens&amp; whereClause])
+</div></code></pre>
+<p>删除表中数据。参数指定删除条件。若省略该参数，删除表中全部数据，但保留表的结构。返回删除的行数。</p>
+<p><code>whereClause</code> 形如 <code>split(&quot;id=10492 or name='q'&quot;)</code>，下同。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-keyword">int</span> Table::update(<span class="hljs-keyword">const</span> tokens&amp; setClause [, <span class="hljs-keyword">const</span> tokens&amp; whereClause])
+</div></code></pre>
+<p><code>setClause</code> 形如 <code>split(&quot;stu_name='b'&quot;)</code></p>
+<p>修改表中数据。第一个参数指定修改方法，第二个指定修改条件。若省略第二个参数，则对所有记录进行修改。返回修改的行数。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-keyword">int</span> Table::select(<span class="hljs-keyword">const</span> attrs&amp; attrName [, <span class="hljs-keyword">const</span> tokens&amp; whereClause])
+</div></code></pre>
+<p><code>attrName</code> 形如 <code>{&quot;name&quot;,&quot;id&quot;}</code>。</p>
+<p>查询表中数据并输出。第一个参数指定要输出的列，第二个指定查询条件。若省略第二个参数，输出表中全部数据。返回被输出的行数。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-keyword">void</span> Table::show()
+</div></code></pre>
+<p>输出表的结构，格式与 <code>SHOW COLUMNS FROM table</code> 相同。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-keyword">void</span> Table::sort(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> attrName)
+</div></code></pre>
+<p>对表中数据进行排序。参数指定根据哪一列进行排序。若省略该参数，则按主键排序。若省略该参数且表无主键，则什么都不做。</p>
+<hr>
+<h2 id="database-databasehcpp"><code>Database</code> (database.h/cpp)</h2>
+<p>定义了数据库对象。包含数据库名称及其各表。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">private</span>: <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> Database::dbName
+</div></code></pre>
+<p>保存数据库的名称。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-built_in">std</span>::<span class="hljs-built_in">map</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>, Table*&gt; Database::table
+</div></code></pre>
+<p>保存表名到指向表的指针的映射。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: Database::Database(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> dbName)
+</div></code></pre>
+<p>构造空数据库。参数指定表的名称。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-keyword">void</span> Database::drop(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> tableName)
+</div></code></pre>
+<p>删除一张表。参数指定要删的表的名称。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-keyword">void</span> Database::create(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> tableName, <span class="hljs-keyword">const</span> tokens&amp; traits)
+</div></code></pre>
+<p>创建新表。第一个参数指定表的名称。第二个参数指定表的各列属性。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">show</span><span class="hljs-params">()</span>
+</span></div></code></pre>
+<p>输出数据库中包含的各表。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">show</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> tableName)</span>
+</span></div></code></pre>
+<p>输出指定表的结构，格式与 <code>SHOW COLUMNS FROM table</code> 相同。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">public</span>: Table* Database::<span class="hljs-keyword">operator</span> [] (<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>)
+</div></code></pre>
+<p>根据名称返回相应表的指针。实质上直接访问了 <code>Database::table</code> 映射，是 <code>Database::table.operator[] (std::string)</code> 的简化写法。</p>
+<hr>
+<h2 id="tools-toolshcpp">Tools (tools.h/cpp)</h2>
+<p>提供其它模块中用到的辅助工具。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">typedef</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt; tokens
+</div></code></pre>
+<p>一列若干个字符串。用于 MySQL 语法解析，此时每个元素都是一个 MySQL 语法中的符号（当前包含数字、标识符、关键字、运算符、字符串、分隔符六种），并且将整个 <code>tokens</code> 中的全部符号按顺序连在一起即得一条完整的 MySQL 语句或语句中用到的完整的子句。</p>
+<pre><code class="language-c++"><div><span class="hljs-keyword">typedef</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt; attrs
+</div></code></pre>
+<p>一列若干个字符串。本质上与 <code>tokens</code> 是同一类型，但在本数据库中含义不同。<code>attrs</code> 用于保存若干个列的名称的集合，中间不需要任何分隔符（如果完全按照 <code>tokens</code> 的语义，需要在各列之间加逗号分开）。</p>
+<pre><code class="language-c++"><div><span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt; split(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>)
+</div></code></pre>
+<p>解析 MySQL 语句，将其切分为 MySQL 中最小的语法单位（token，单词/符号）并返回。返回的数组中，每个元素都一定是数字、标识符（数据库名、表名、列名）、关键字（例如 <code>SELECT</code>、<code>WHERE</code> 等）、运算符（<code>AND</code>、<code>&gt;</code> 等）、字符串、分隔符（例如括号、逗号、分号等）之一。</p>
+<p><strong>注意</strong>：本数据库当前不支持非布尔运算。负数被认为是一个整体，而不是被拆分为负号和绝对值两个 token；MySQL 语法中，两个紧挨一起的字符串会被连接，认为是一个整体，但本数据库程序会将它们认为是两个 token。</p>
+<pre><code class="language-c++"><div><span class="hljs-built_in">std</span>::<span class="hljs-function"><span class="hljs-built_in">string</span> <span class="hljs-title">stringToLower</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>)</span>
+</span></div></code></pre>
+<p>将参数中的大写字母全部转换为小写字母。</p>
+<hr>
+<h2 id="client-maincpp">Client (main.cpp)</h2>
+<p>主程序，实现了完整的关系型数据库管理系统（RDBMS）。</p>
+<p>本文件 main.cpp 同时也是数据库第一阶段的测试代码。</p>
+<pre><code class="language-c++"><div><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">drop</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> dbName)</span>
+</span></div></code></pre>
+<p>根据指定的名称删除一个数据库。</p>
+<pre><code class="language-c++"><div><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">create</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> dbName)</span>
+</span></div></code></pre>
+<p>创建指定名称的数据库。</p>
+<pre><code class="language-c++"><div><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">use</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> dbName)</span>
+</span></div></code></pre>
+<p>选中指定名称的数据库。</p>
+<pre><code class="language-c++"><div><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">show</span><span class="hljs-params">()</span>
+</span></div></code></pre>
+<p>输出所有数据库的名称。</p>
+<pre><code class="language-c++"><div><span class="hljs-built_in">std</span>::<span class="hljs-built_in">map</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>, Database*&gt; dbList
+</div></code></pre>
+<p>保存数据库名到指向数据库的指针的映射。</p>
+<pre><code class="language-c++"><div>Database* selected
+</div></code></pre>
+<p>指向当前通过 <code>USE</code> 语句选中的数据库。</p>
+<pre><code class="language-c++"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span>
+</span></div></code></pre>
+<p>主程序入口。通过以上各个文件中提供的功能，解析 MySQL 命令并执行对应操作。</p>
+
+    </body>
+    </html>

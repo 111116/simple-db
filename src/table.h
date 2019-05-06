@@ -8,8 +8,7 @@
 #include "data_t.h"
 #include "cond_t.h"
 #include "set_t.h"
-
-typedef std::vector<std::string> tokens;
+#include "tools.h"
 
 class Table
 {
@@ -18,36 +17,37 @@ private:
 	{
 		INTEGER, DOUBLE, STRING
 	};
-	struct attr_t
+	struct attr_t // 列属性
 	{
-		//int width;
-		type_t type;
-		std::string name;
-		bool nonNull;
-		std::string typeName() const;
+		//int width; // 数据的显示宽度，该属性为预留接口，当前暂不使用
+		type_t type; // 列数据类型
+		std::string name; // 列名称
+		bool nonNull; // 是否要求非空
+		std::string typeName() const; // 列数据类型的名称，用于Table::show()
 	};
-	std::vector<attr_t> attr;
-	std::unordered_map<std::string, unsigned> attrIndex;
-	std::vector<Entry> data;
-	int primaryAttr = -1;
+	std::vector<attr_t> attr; // 各列属性
+	std::unordered_map<std::string, unsigned> attrIndex; // 用于由列名称查询是第几列
+	std::vector<Entry> data; // 各行数据
+	int primaryAttr = -1; // 主键是第几列，无主键则为-1
 
-	cond_t atomCond(const tokens&);
-	set_t atomSet(const tokens&);
-	cond_t buildCond(const tokens&);
-	set_t buildSet(const tokens&);
-	Entry buildEntry(const tokens& attrName, const tokens& dataValue);
+	cond_t atomCond(const tokens&); // 构造单运算符的判断条件，见cond_t
+	set_t atomSet(const tokens&); // 构造单赋值符的修改器，目前仅支持赋为字面值，见set_t
+	cond_t buildCond(const tokens&); // 构造判断条件
+	set_t buildSet(const tokens&); // 构造修改器（目前仅支持单赋值符，行为同atomSet）
+	Entry buildEntry(const tokens& attrNames, const tokens& attrValues); // 构造一行数据，参数格式见实现处注释
 
 public:
 	Table(const tokens& attrClause);
 
-	tokens attrList() const;
-	int insert(const tokens& attrName, const tokens& attrValue);
-	int remove();
+	attrs attrList() const;
+	int insert(const tokens& attrNames, const tokens& attrValues);
+	int remove(); // 清空数据，保留各列属性
 	int remove(const tokens& whereClause);
-	int update(const tokens& setClause);
+	int update(const tokens& setClause); // 目前仅支持将单个列赋为字面值
 	int update(const tokens& setClause, const tokens& whereClause);
-	int select(const tokens& attrName);
-	int select(const tokens& attrName, const tokens& whereClause);
+	int select(const attrs& attrName);
+	int select(const attrs& attrName, const tokens& whereClause);
 
-	void show(std::ostream& = std::cout);
+	void show();
+	void sort(std::string attrName = "");
 };
