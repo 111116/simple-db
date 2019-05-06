@@ -16,7 +16,7 @@ cd simple-db/src && make
 程序在以下环境下测试通过。
 
 * clang-1000.11.45.5 @ x86_64-apple-darwin18.2.0
-* g++ 7.3.0 @ Ubuntu 18.04 (WSL/Windows 10.0.18362.86)
+* g++ 7.4.0 @ Ubuntu 18.04 (WSL/Windows 10.0.18362.86)
 * 评测 OJ 环境
 
 使用较低版本的 GCC 套件编译可能失败。
