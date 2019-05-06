@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "tools.h"
 
 // 对 MySQL 语句进行分词
